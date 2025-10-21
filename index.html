@@ -2,24 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AARAV PANDEY - Coming Soon</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coming Soon - Aarav Pandey</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: "Poppins", sans-serif;
+      overflow: hidden;
+    }
+
+    nav {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      font-size: 4rem;
+      font-weight: 700;
+      margin: 0;
+      position: relative;
+      display: inline-block;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+    }
+
+    h1:hover {
+      border-color: #fff;
+    }
+
+    .dots {
+      display: inline-block;
+      width: 1.5em;
+      text-align: left;
+    }
+
+    .dots::after {
+      content: '';
+      animation: dots 1.5s steps(3, end) infinite;
+    }
+
+    @keyframes dots {
+      0% { content: ''; }
+      33% { content: '.'; }
+      66% { content: '..'; }
+      100% { content: '...'; }
+    }
+
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
-  <canvas id="dots-canvas"></canvas>
-  <canvas id="particle-canvas"></canvas>
-  <div class="container" role="main">
-    <h1 class="name name-title" aria-label="Aarav Pandey">
-      <span class="letter">A</span><span class="letter">A</span><span class="letter">R</span>
-      <span class="letter">A</span><span class="letter">V</span>&nbsp;
-      <span class="letter">P</span><span class="letter">A</span><span class="letter">N</span>
-      <span class="letter">D</span><span class="letter">E</span><span class="letter">Y</span>
-    </h1>
-    <p class="subtitle">COMING SOON</p>
-    <a class="email" href="mailto:aaravpandey@nigge.rs">aaravpandey@example.com</a>
-  </div>
-
-  <script src="script.js"></script>
+  <nav>AARAV PANDEY</nav>
+  <h1 class="fade-in">Coming Soon<span class="dots"></span></h1>
 </body>
 </html>
