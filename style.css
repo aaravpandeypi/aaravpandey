@@ -7,82 +7,69 @@
 body, html {
   height: 100%;
   background: #000;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  text-align: center;
 }
 
-/* Canvas layers */
-#dots-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-#particle-canvas {
+canvas {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 1;
+  pointer-events: none;
 }
 
-/* Content */
+/* Container content */
 .container {
   position: relative;
   z-index: 10;
-  text-align: center;
-  color: #ccc;
   padding: 20px;
+  color: #ccc;
 }
 
 .name-title {
-  font-size: 6vw;
+  font-size: clamp(2rem, 6vw, 5rem);
   font-weight: 700;
+  letter-spacing: 0.05em;
   display: inline-flex;
   flex-wrap: wrap;
   justify-content: center;
-  letter-spacing: 0.05em;
 }
 
 .letter {
-  margin: 0 0.1em;
+  cursor: default;
   transition: color 0.3s ease;
+  margin: 0 0.05em;
+  color: #ccc;
 }
 
 .letter:hover {
-  color: #777;
+  color: #888;
 }
 
 .subtitle {
   margin-top: 0.3em;
-  font-size: 2vw;
+  font-size: clamp(1.2rem, 3vw, 2rem);
 }
 
 .email {
   display: inline-block;
   margin-top: 0.6em;
-  font-size: 1.6vw;
-  color: #ccc;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: #aaa;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .email:hover {
-  color: #999;
+  color: #fff;
   text-decoration: underline;
-}
-
-@media (max-width: 600px) {
-  .name-title { font-size: 12vw; }
-  .subtitle { font-size: 5vw; }
-  .email { font-size: 4vw; }
 }
