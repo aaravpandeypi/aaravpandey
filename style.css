@@ -7,7 +7,7 @@
 
 body, html { 
   height: 100%;
-  background: #000000;
+  background: #000;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   justify-content: center;
@@ -22,7 +22,7 @@ body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; bottom: 0; right: 0;
-  background-image: radial-gradient(#555555 1px, transparent 1px);
+  background-image: radial-gradient(#555 1px, transparent 1px);
   background-size: 40px 40px;
   opacity: 0.3;
   pointer-events: none;
@@ -38,6 +38,7 @@ canvas {
   z-index: 1;
   pointer-events: none;
 }
+
 #mouse-trail, .gravity-wells, .neural-network, .chromatic-layer {
   position: fixed;
   top: 0; left: 0;
@@ -46,14 +47,13 @@ canvas {
   z-index: 2;
 }
 
-/* Content styling */
 .container {
   position: relative;
   z-index: 10;
   text-align: center;
   padding: 20px;
   max-width: 90vw;
-  color: #CCCCCC;
+  color: #ccc;
 }
 
 .name-title {
@@ -69,26 +69,26 @@ canvas {
   cursor: default;
   transition: color 0.3s ease;
   margin: 0 0.1em;
-  color: #CCCCCC;
+  color: #ccc;
 }
-.letter:hover {
-  color: #777777;
-}
+.letter:hover { color: #777; }
 
 .subtitle {
   margin-top: 0.3em;
   font-size: 2vw;
 }
+
 .email {
   display: inline-block;
   margin-top: 0.6em;
   font-size: 1.6vw;
-  color: #CCCCCC;
+  color: #ccc;
   text-decoration: none;
   transition: color 0.3s ease;
 }
+
 .email:hover {
-  color: #999999;
+  color: #999;
   text-decoration: underline;
 }
 
