@@ -5,7 +5,7 @@
   box-sizing: border-box;
 }
 
-body, html {
+body, html { 
   height: 100%;
   background: #000000;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
