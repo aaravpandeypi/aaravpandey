@@ -1,10 +1,11 @@
+/* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body, html {
+html, body {
   height: 100%;
   background: #000;
   font-family: 'Poppins', sans-serif;
@@ -13,10 +14,10 @@ body, html {
   align-items: center;
   flex-direction: column;
   overflow: hidden;
-  position: relative;
   text-align: center;
 }
 
+/* Canvas layers */
 canvas {
   position: fixed;
   top: 0;
@@ -27,14 +28,16 @@ canvas {
   pointer-events: none;
 }
 
-/* Container content */
+/* Main content */
 .container {
   position: relative;
   z-index: 10;
+  color: #00FFFF;
   padding: 20px;
-  color: #ccc;
+  max-width: 90vw;
 }
 
+/* Name styling */
 .name-title {
   font-size: clamp(2rem, 6vw, 5rem);
   font-weight: 700;
@@ -45,31 +48,31 @@ canvas {
 }
 
 .letter {
-  cursor: default;
-  transition: color 0.3s ease;
   margin: 0 0.05em;
-  color: #ccc;
+  transition: color 0.3s ease;
+  cursor: default;
 }
 
 .letter:hover {
-  color: #888;
+  color: #0ff;
 }
 
+/* Subtitle and email */
 .subtitle {
-  margin-top: 0.3em;
+  margin-top: 0.5em;
   font-size: clamp(1.2rem, 3vw, 2rem);
 }
 
 .email {
   display: inline-block;
-  margin-top: 0.6em;
-  font-size: clamp(1rem, 2.5vw, 1.4rem);
-  color: #aaa;
+  margin-top: 0.5em;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: #00FFFF;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: opacity 0.3s;
 }
 
 .email:hover {
-  color: #fff;
+  opacity: 0.8;
   text-decoration: underline;
 }
