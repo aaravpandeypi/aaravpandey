@@ -1,78 +1,87 @@
-/* Reset and base styles */
+/* ===== BASIC RESET ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
-  height: 100%;
+/* ===== LAYOUT ===== */
+body {
   background: #000;
-  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  overflow: hidden;
   text-align: center;
+  position: relative;
 }
 
-/* Canvas layers */
-canvas {
+/* ===== CANVAS BACKGROUND ===== */
+#dots-canvas,
+#particle-canvas {
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;
-  pointer-events: none;
 }
 
-/* Main content */
+/* ===== CONTENT ===== */
 .container {
   position: relative;
-  z-index: 10;
-  color: #00FFFF;
+  z-index: 1;
   padding: 20px;
-  max-width: 90vw;
 }
 
-/* Name styling */
-.name-title {
-  font-size: clamp(2rem, 6vw, 5rem);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  display: inline-flex;
-  flex-wrap: wrap;
-  justify-content: center;
+.name {
+  font-size: 4rem;
+  letter-spacing: 4px;
+  font-weight: 600;
 }
 
-.letter {
-  margin: 0 0.05em;
-  transition: color 0.3s ease;
-  cursor: default;
-}
-
-.letter:hover {
-  color: #0ff;
-}
-
-/* Subtitle and email */
 .subtitle {
-  margin-top: 0.5em;
-  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-size: 2rem;
+  margin-top: 10px;
+  font-weight: 400;
+  letter-spacing: 3px;
 }
 
 .email {
   display: inline-block;
-  margin-top: 0.5em;
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  color: #00FFFF;
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #00ffff;
   text-decoration: none;
-  transition: opacity 0.3s;
+  transition: color 0.3s;
 }
 
 .email:hover {
-  opacity: 0.8;
-  text-decoration: underline;
+  color: #fff;
+}
+
+/* ===== RESPONSIVENESS ===== */
+@media (max-width: 768px) {
+  .name {
+    font-size: 2.5rem;
+  }
+  .subtitle {
+    font-size: 1.4rem;
+  }
+  .email {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .name {
+    font-size: 2rem;
+  }
+  .subtitle {
+    font-size: 1.2rem;
+  }
 }
