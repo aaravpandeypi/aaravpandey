@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Project Flaperon — Aarav Pandey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#03030A;
+  --surface:#0A0A14;
+  --panel:#0F0F1C;
+  --card:#131321;
+  --border:rgba(242,239,233,.07);
+  --border-hover:rgba(232,213,176,.22);
+  --paper:#F2EFE9;
+  --parchment:#E8D5B0;
+  --dim:rgba(242,239,233,.38);
+  --dimmer:rgba(242,239,233,.2);
+  --blue:#1A1AFF;
+  --blue-soft:rgba(26,26,255,.12);
+  --f-display:'DM Serif Display',serif;
+  --f-mono:'Space Mono',monospace;
+  --f-body:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--void);
+  color:var(--paper);
+  font-family:var(--f-body);
+  cursor:none;
+  min-height:100vh;
+}
+/* noise */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px;
+}
+
+/* cursor */
+#cur{position:fixed;width:6px;height:6px;background:var(--parchment);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .12s}
+#cur-r{position:fixed;width:26px;height:26px;border:1px solid rgba(232,213,176,.2);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .07s,top .07s,width .18s,height .18s,border-color .2s}
+
+/* ── top bar ── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:56px;z-index:800;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 36px;
+  border-bottom:1px solid var(--border);
+  background:rgba(3,3,10,.92);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.tb-back{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.15em;
+  color:var(--dim);text-transform:uppercase;text-decoration:none;
+  transition:color .2s;cursor:pointer;
+}
+.tb-back:hover{color:var(--paper)}
+.tb-back svg{width:14px;height:14px;opacity:.6}
+.tb-title{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;
+  color:var(--dimmer);text-transform:uppercase;
+  position:absolute;left:50%;transform:translateX(-50%);
+}
+.tb-right{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.12em;color:var(--dimmer);
+}
+
+/* ── layout ── */
+#page{
+  max-width:860px;
+  margin:0 auto;
+  padding:96px 36px 120px;
+  position:relative;z-index:1;
+}
+
+/* ── section header ── */
+.s-eyebrow{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--parchment);
+  opacity:.6;margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.s-eyebrow::before{content:'';width:20px;height:1px;background:var(--parchment);opacity:.5}
+.s-title{
+  font-family:var(--f-display);
+  font-size:clamp(38px,5.5vw,64px);
+  line-height:1.0;letter-spacing:-.02em;
+  margin-bottom:14px;color:var(--paper);
+}
+.s-title em{font-style:italic;color:var(--parchment)}
+.s-desc{
+  font-size:14px;color:var(--dim);
+  max-width:540px;line-height:1.75;
+  margin-bottom:56px;
+}
+
+/* ── divider ── */
+.divider{
+  width:100%;height:1px;
+  background:linear-gradient(to right,transparent,var(--border),transparent);
+  margin:80px 0;
+}
+
+/* ── paper card ── */
+.paper-list{display:flex;flex-direction:column;gap:2px}
+.paper-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  transition:border-color .25s,background .25s;
+  overflow:hidden;
+}
+.paper-card:hover{border-color:var(--border-hover)}
+.paper-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;padding:26px 28px;cursor:pointer;
+  user-select:none;
+}
+.paper-meta{flex:1;min-width:0}
+.paper-label{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--parchment);opacity:.6;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.paper-label .dot{width:4px;height:4px;background:var(--parchment);border-radius:50%;opacity:.6}
+.paper-num{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.1em;
+  color:var(--dimmer);
+}
+.paper-title{
+  font-family:var(--f-display);font-size:20px;color:var(--paper);
+  line-height:1.25;margin-bottom:8px;
+}
+.paper-abstract{
+  font-size:13px;color:var(--dim);line-height:1.65;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.paper-abstract.expanded{display:block;-webkit-line-clamp:unset}
+.paper-toggle{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.15em;
+  color:var(--dimmer);text-transform:uppercase;
+  white-space:nowrap;flex-shrink:0;margin-top:4px;
+  transition:color .2s;
+}
+.paper-card:hover .paper-toggle{color:var(--parchment)}
+.paper-toggle svg{transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.paper-toggle.open svg{transform:rotate(180deg)}
+
+/* paper expanded body */
+.paper-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .5s cubic-bezier(.4,0,.2,1);
+  border-top:0px solid var(--border);
+}
+.paper-body.open{
+  max-height:2400px;
+  border-top-width:1px;
+}
+.paper-body-inner{padding:28px 28px 0}
+
+/* view button */
+.btn-view{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--void);background:var(--parchment);
+  border:none;padding:11px 22px;cursor:pointer;
+  transition:background .2s,transform .15s;
+  text-decoration:none;
+}
+.btn-view:hover{background:var(--paper);transform:translateY(-1px)}
+.btn-view svg{width:12px;height:12px}
+.readonly-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--dimmer);
+  padding:6px 12px;border:1px solid var(--border);
+  margin-left:10px;
+}
+
+/* ── comments ── */
+.comments-section{
+  border-top:1px solid var(--border);
+  margin-top:28px;padding:24px 0 28px;
+}
+.comments-label{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--dimmer);margin-bottom:20px;
+}
+.comment-thread{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+.comment-item{
+  display:flex;gap:14px;
+}
+.comment-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--panel);border:1px solid var(--border);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:10px;color:var(--dim);
+  margin-top:2px;
+}
+.comment-bubble{flex:1;min-width:0}
+.comment-author{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.12em;
+  color:var(--parchment);text-transform:uppercase;margin-bottom:5px;
+  display:flex;align-items:center;gap:10px;
+}
+.comment-time{color:var(--dimmer);font-size:8px}
+.comment-text{font-size:13px;color:rgba(242,239,233,.7);line-height:1.6}
+
+.comment-form{display:flex;gap:10px;align-items:flex-start}
+.comment-avatar-new{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--blue-soft);border:1px solid rgba(26,26,255,.3);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:10px;color:rgba(26,26,255,.8);
+  margin-top:2px;
+}
+.comment-inputs{flex:1;display:flex;flex-direction:column;gap:8px}
+.comment-name-row{display:flex;gap:8px}
+.c-input{
+  background:var(--panel);
+  border:1px solid var(--border);
+  color:var(--paper);
+  font-family:var(--f-body);font-size:13px;
+  padding:10px 14px;
+  transition:border-color .2s;
+  outline:none;width:100%;
+  resize:none;
+}
+.c-input::placeholder{color:var(--dimmer);font-size:12px}
+.c-input:focus{border-color:rgba(232,213,176,.3)}
+.c-input.name{flex:1}
+.btn-comment{
+  align-self:flex-end;
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  background:transparent;border:1px solid rgba(232,213,176,.25);
+  color:var(--parchment);padding:10px 18px;cursor:pointer;
+  transition:border-color .2s,background .2s;
+  white-space:nowrap;
+}
+.btn-comment:hover{border-color:var(--parchment);background:rgba(232,213,176,.06)}
+.no-comments{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;
+  color:var(--dimmer);text-align:center;padding:20px 0;
+  border:1px dashed rgba(242,239,233,.06);
+}
+
+/* ── community upload ── */
+#community{
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:44px;
+  position:relative;
+}
+.upload-area{
+  border:1px dashed rgba(232,213,176,.2);
+  padding:48px 28px;
+  text-align:center;
+  cursor:pointer;
+  transition:border-color .3s,background .3s;
+  margin-bottom:28px;
+}
+.upload-area:hover,.upload-area.drag{
+  border-color:rgba(232,213,176,.5);
+  background:rgba(232,213,176,.03);
+}
+.upload-area input{display:none}
+.up-icon{font-size:28px;margin-bottom:14px;display:block}
+.up-text{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--dim);
+}
+.up-text span{color:var(--parchment);border-bottom:1px solid rgba(232,213,176,.3)}
+.up-sub{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.1em;
+  color:var(--dimmer);margin-top:8px;text-transform:uppercase;
+}
+.sub-form{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;
+}
+@media(max-width:600px){.sub-form{grid-template-columns:1fr}}
+.sub-form .c-input.full{grid-column:1/-1}
+.btn-submit{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  background:var(--parchment);color:var(--void);
+  border:none;padding:13px 28px;cursor:pointer;
+  transition:background .2s,transform .15s;
+  display:block;width:100%;margin-top:10px;
+}
+.btn-submit:hover{background:var(--paper);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* community papers */
+.community-list{display:flex;flex-direction:column;gap:2px;margin-top:40px}
+.c-paper-card{
+  background:var(--card);border:1px solid var(--border);
+  padding:22px 26px;
+  transition:border-color .2s;
+}
+.c-paper-card:hover{border-color:var(--border-hover)}
+.c-paper-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.c-paper-title{
+  font-family:var(--f-display);font-size:17px;color:var(--paper);line-height:1.2;margin-bottom:6px;
+}
+.c-paper-author{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--parchment);opacity:.6;
+}
+.c-paper-badge{
+  font-family:var(--f-mono);font-size:8px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--dimmer);
+  border:1px solid var(--border);padding:4px 10px;
+  white-space:nowrap;flex-shrink:0;
+}
+.c-paper-desc{font-size:13px;color:var(--dim);line-height:1.6;margin-top:10px}
+
+/* toast */
+#toast{
+  position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--card);border:1px solid var(--border);
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;
+  color:var(--parchment);padding:12px 24px;z-index:9990;
+  opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;
+  white-space:nowrap;text-transform:uppercase;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* empty state */
+.empty-state{
+  padding:48px 0;text-align:center;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.15em;
+  color:var(--dimmer);text-transform:uppercase;
+  border:1px dashed rgba(242,239,233,.05);
+}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(242,239,233,.1);border-radius:2px}
+
+@media(max-width:600px){
+  #page{padding:80px 20px 100px}
+  #topbar{padding:0 20px}
+  #community{padding:28px 20px}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<!-- top bar -->
+<div id="topbar">
+  <a class="tb-back" href="index.html">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 2L4 7l5 5"/></svg>
+    Back
+  </a>
+  <span class="tb-title">Project Flaperon</span>
+  <span class="tb-right" id="tb-clock"></span>
+</div>
+
+<!-- main page -->
+<div id="page">
+
+  <!-- ── HERO ── -->
+  <div style="margin-bottom:80px">
+    <div class="s-eyebrow">Aviation Safety Research</div>
+    <div class="s-title">Project<br/><em>Flaperon</em></div>
+    <p class="s-desc">An independent research initiative investigating aerodynamic component failure, accident causation patterns, and forensic methodology in aviation safety. All papers are original research.</p>
+  </div>
+
+  <!-- ── SECTION 1: MY REPOSITORY ── -->
+  <div class="s-eyebrow">Research Archive</div>
+  <h2 style="font-family:var(--f-display);font-size:clamp(24px,3.5vw,36px);margin-bottom:10px;color:var(--paper)">My Research Papers</h2>
+  <p style="font-size:13px;color:var(--dim);margin-bottom:36px;line-height:1.7;max-width:480px">Original research authored by Aarav Pandey. Papers are read-only. Click any paper to expand, read the abstract, and leave a comment.</p>
+
+  <div class="paper-list" id="my-papers-list">
+    <!-- populated by JS from MY_PAPERS constant -->
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 2: COMMUNITY SUBMISSIONS ── -->
+  <div id="community">
+    <div class="s-eyebrow">Open Submissions</div>
+    <h2 style="font-family:var(--f-display);font-size:clamp(22px,3vw,34px);margin-bottom:10px;color:var(--paper)">Submit a Research Paper</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:36px;line-height:1.7;max-width:500px">The floor is open. If your research connects to aviation safety — submit it here. All submissions are visible to everyone in the community.</p>
+
+    <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept=".pdf,.doc,.docx" onchange="handleFileSelect(event)"/>
+      <span class="up-icon">📄</span>
+      <div class="up-text">Drop your paper here or <span>browse</span></div>
+      <div class="up-sub">PDF · DOC · DOCX &nbsp;·&nbsp; Max 20MB</div>
+      <div id="selected-file-name" style="font-family:var(--f-mono);font-size:10px;color:var(--parchment);margin-top:12px;letter-spacing:.1em;display:none"></div>
+    </div>
+
+    <div class="sub-form">
+      <input class="c-input" id="sub-title" type="text" placeholder="Paper title *"/>
+      <input class="c-input" id="sub-author" type="text" placeholder="Your name *"/>
+      <textarea class="c-input full" id="sub-abstract" rows="3" placeholder="Brief abstract (optional)"></textarea>
+    </div>
+    <button class="btn-submit" id="btn-submit" onclick="submitPaper()">Submit Paper →</button>
+  </div>
+
+  <!-- community papers list -->
+  <div style="margin-top:2px">
+    <div style="padding:18px 0 22px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dimmer)">Community submissions</span>
+      <span id="sub-count" style="font-family:var(--f-mono);font-size:9px;letter-spacing:.15em;color:var(--dimmer)">0 papers</span>
+    </div>
+    <div class="community-list" id="community-list"></div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA — ADD YOUR REAL PAPERS HERE
+//  Each entry: { id, num, title, abstract, date, link }
+//  link: URL to the PDF (can be a Google Drive link, etc.)
+// ══════════════════════════════════════════════
+const MY_PAPERS = [
+  {
+    id: 'fp-001',
+    num: 'FP-001',
+    title: 'Flaperon Debris Analysis',
+    date: '2024',
+    abstract: 'A structural and compositional analysis of flaperon wreckage in relation to high-speed oceanic entry dynamics. This paper examines physical evidence from recovered aerodynamic surface components and proposes an analytical framework for determining impact vectors from debris deformation patterns.',
+    link: null, // Replace with: 'https://drive.google.com/...' or a local PDF path
+  },
+  {
+    id: 'fp-002',
+    num: 'FP-002',
+    title: 'Aviation Safety Patterns: A Systemic Review',
+    date: '2024',
+    abstract: 'Pattern recognition in aviation incident data — identifying systemic failure vectors across commercial operations over the past three decades. Focuses on the intersection of human factors, maintenance cycles, and regulatory lag as compounding causal agents in aviation accidents.',
+    link: null,
+  },
+  {
+    id: 'fp-003',
+    num: 'FP-003',
+    title: 'Aerodynamic Component Forensics',
+    date: '2025',
+    abstract: 'A methodology framework for post-incident aerodynamic surface analysis in the absence of full wreckage recovery. Proposes a probabilistic classification system for component failure modes using partial physical evidence, drift-pattern modeling, and material fatigue signatures.',
+    link: null,
+  },
+];
+
+// ══════════════════════════════════════════════
+//  STORAGE HELPERS (persistent across sessions)
+// ══════════════════════════════════════════════
+async function storageGet(key) {
+  try {
+    const r = await window.storage.get(key, true);
+    return r ? JSON.parse(r.value) : null;
+  } catch { return null; }
+}
+async function storageSet(key, val) {
+  try {
+    await window.storage.set(key, JSON.stringify(val), true);
+  } catch(e) { console.error('storage error', e); }
+}
+
+// ══════════════════════════════════════════════
+//  CURSOR
+// ══════════════════════════════════════════════
+const cur = document.getElementById('cur');
+const crr = document.getElementById('cur-r');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+  crr.style.left = e.clientX + 'px'; crr.style.top = e.clientY + 'px';
+});
+function addHoverEffect(sel) {
+  document.querySelectorAll(sel).forEach(el => {
+    el.addEventListener('mouseenter', () => { crr.style.width = '46px'; crr.style.height = '46px'; crr.style.borderColor = 'rgba(232,213,176,.4)'; });
+    el.addEventListener('mouseleave', () => { crr.style.width = '26px'; crr.style.height = '26px'; crr.style.borderColor = 'rgba(232,213,176,.2)'; });
+  });
+}
+
+// ══════════════════════════════════════════════
+//  CLOCK
+// ══════════════════════════════════════════════
+function tick() {
+  const t = new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',hour12:false});
+  document.getElementById('tb-clock').textContent = 'IST ' + t;
+}
+tick(); setInterval(tick, 1000);
+
+// ══════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ══════════════════════════════════════════════
+//  COMMENTS
+// ══════════════════════════════════════════════
+async function loadComments(paperId) {
+  return (await storageGet('comments:' + paperId)) || [];
+}
+async function saveComment(paperId, name, text) {
+  const comments = await loadComments(paperId);
+  comments.push({
+    name: name.trim() || 'Anonymous',
+    text: text.trim(),
+    time: Date.now(),
+  });
+  await storageSet('comments:' + paperId, comments);
+  return comments;
+}
+function renderComments(paperId, comments, container) {
+  const thread = container.querySelector('.comment-thread');
+  thread.innerHTML = '';
+  if (!comments.length) {
+    thread.innerHTML = '<div class="no-comments">No comments yet — be the first.</div>';
+    return;
+  }
+  comments.forEach(c => {
+    const initials = c.name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+    const timeStr = new Date(c.time).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+    thread.innerHTML += `
+      <div class="comment-item">
+        <div class="comment-avatar">${initials}</div>
+        <div class="comment-bubble">
+          <div class="comment-author">${esc(c.name)}<span class="comment-time">${timeStr}</span></div>
+          <div class="comment-text">${esc(c.text)}</div>
+        </div>
+      </div>`;
+  });
+}
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════
+//  MY PAPERS — RENDER
+// ══════════════════════════════════════════════
+async function renderMyPapers() {
+  const list = document.getElementById('my-papers-list');
+  if (!MY_PAPERS.length) {
+    list.innerHTML = '<div class="empty-state">No papers added yet — edit MY_PAPERS in the source.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  for (const p of MY_PAPERS) {
+    const comments = await loadComments(p.id);
+    const card = document.createElement('div');
+    card.className = 'paper-card';
+    card.id = 'card-' + p.id;
+    card.innerHTML = `
+      <div class="paper-head" onclick="togglePaper('${p.id}')">
+        <div class="paper-meta">
+          <div class="paper-label">
+            <span class="dot"></span>Research Paper
+            <span class="paper-num">${p.num}</span>
+          </div>
+          <div class="paper-title">${esc(p.title)}</div>
+          <div class="paper-abstract" id="abs-${p.id}">${esc(p.abstract)}</div>
+        </div>
+        <div>
+          <div class="paper-toggle" id="tog-${p.id}">
+            <span>${comments.length} comment${comments.length!==1?'s':''}</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l4 4 4-4"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="paper-body" id="body-${p.id}">
+        <div class="paper-body-inner">
+          <div style="padding-bottom:22px;display:flex;align-items:center;flex-wrap:wrap;gap:10px">
+            ${p.link
+              ? `<a class="btn-view" href="${p.link}" target="_blank" rel="noopener">
+                   <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1h5v5M11 1L5 7M2 3H1v8h8V9"/></svg>
+                   View Paper
+                 </a>`
+              : `<span class="btn-view" style="opacity:.45;cursor:not-allowed;background:var(--panel);color:var(--dim)">Paper link coming soon</span>`
+            }
+            <span class="readonly-badge">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="4" width="6" height="5" rx=".5"/><path d="M3.5 4V3a1.5 1.5 0 0 1 3 0v1"/></svg>
+              Read only
+            </span>
+          </div>
+          <div style="padding-bottom:24px">
+            <div style="font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dimmer);margin-bottom:12px">Full Abstract</div>
+            <p style="font-size:14px;color:rgba(242,239,233,.7);line-height:1.75">${esc(p.abstract)}</p>
+          </div>
+          <div class="comments-section">
+            <div class="comments-label">Discussion — <span id="count-${p.id}">${comments.length}</span> comment${comments.length!==1?'s':''}</div>
+            <div class="comment-thread" id="thread-${p.id}"></div>
+            <div class="comment-form" style="margin-top:20px">
+              <div class="comment-avatar-new">↗</div>
+              <div class="comment-inputs">
+                <div class="comment-name-row">
+                  <input class="c-input name" id="cname-${p.id}" type="text" placeholder="Your name"/>
+                </div>
+                <textarea class="c-input" id="ctext-${p.id}" rows="3" placeholder="Share your thoughts, questions, or feedback on this research…"></textarea>
+                <button class="btn-comment" onclick="postComment('${p.id}')">Post comment →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    list.appendChild(card);
+    renderComments(p.id, comments, card);
+  }
+  addHoverEffect('.paper-card,.btn-view,.btn-comment');
+}
+
+async function togglePaper(id) {
+  const body = document.getElementById('body-' + id);
+  const tog  = document.getElementById('tog-' + id);
+  const abs  = document.getElementById('abs-' + id);
+  const isOpen = body.classList.contains('open');
+  // close all others
+  document.querySelectorAll('.paper-body.open').forEach(b => {
+    b.classList.remove('open');
+    b.previousElementSibling?.querySelector('.paper-toggle')?.classList.remove('open');
+    b.previousElementSibling?.querySelector('.paper-abstract')?.classList.remove('expanded');
+  });
+  if (!isOpen) {
+    body.classList.add('open');
+    tog.classList.add('open');
+    abs.classList.add('expanded');
+  }
+}
+
+async function postComment(paperId) {
+  const nameEl = document.getElementById('cname-' + paperId);
+  const textEl = document.getElementById('ctext-' + paperId);
+  const name = nameEl.value.trim();
+  const text = textEl.value.trim();
+  if (!text) { toast('Write something first.'); return; }
+  const btn = document.querySelector(`#body-${paperId} .btn-comment`);
+  btn.disabled = true; btn.textContent = 'Posting…';
+  const comments = await saveComment(paperId, name, text);
+  nameEl.value = ''; textEl.value = '';
+  const card = document.getElementById('card-' + paperId);
+  renderComments(paperId, comments, card);
+  // update count labels
+  document.getElementById('count-' + paperId).textContent = comments.length;
+  const togCount = document.getElementById('tog-' + paperId).childNodes[0];
+  if (togCount) togCount.textContent = `${comments.length} comment${comments.length!==1?'s':''}`;
+  btn.disabled = false; btn.textContent = 'Post comment →';
+  toast('Comment posted.');
+}
+
+// ══════════════════════════════════════════════
+//  COMMUNITY SUBMISSIONS
+// ══════════════════════════════════════════════
+let selectedFile = null;
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  selectedFile = file;
+  const nameEl = document.getElementById('selected-file-name');
+  nameEl.textContent = '✓ ' + file.name;
+  nameEl.style.display = 'block';
+}
+// drag & drop
+const ua = document.getElementById('upload-area');
+ua.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('drag'); });
+ua.addEventListener('dragleave', () => ua.classList.remove('drag'));
+ua.addEventListener('drop', e => {
+  e.preventDefault(); ua.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    selectedFile = file;
+    document.getElementById('selected-file-name').textContent = '✓ ' + file.name;
+    document.getElementById('selected-file-name').style.display = 'block';
+  }
+});
+
+async function submitPaper() {
+  const title = document.getElementById('sub-title').value.trim();
+  const author = document.getElementById('sub-author').value.trim();
+  const abstract = document.getElementById('sub-abstract').value.trim();
+  if (!title || !author) { toast('Title and your name are required.'); return; }
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  const subs = (await storageGet('community-subs')) || [];
+  subs.unshift({
+    id: 'sub-' + Date.now(),
+    title, author, abstract,
+    filename: selectedFile ? selectedFile.name : null,
+    date: Date.now(),
+  });
+  await storageSet('community-subs', subs);
+  // reset
+  document.getElementById('sub-title').value = '';
+  document.getElementById('sub-author').value = '';
+  document.getElementById('sub-abstract').value = '';
+  document.getElementById('selected-file-name').style.display = 'none';
+  selectedFile = null;
+  document.getElementById('file-input').value = '';
+  btn.disabled = false; btn.textContent = 'Submit Paper →';
+  toast('Paper submitted — thank you.');
+  renderCommunityPapers(subs);
+}
+
+async function renderCommunityPapers(subs) {
+  if (!subs) subs = (await storageGet('community-subs')) || [];
+  const list = document.getElementById('community-list');
+  const countEl = document.getElementById('sub-count');
+  countEl.textContent = subs.length + ' paper' + (subs.length !== 1 ? 's' : '');
+  if (!subs.length) {
+    list.innerHTML = '<div class="empty-state">No community submissions yet.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  subs.forEach(s => {
+    const dateStr = new Date(s.date).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+    list.innerHTML += `
+      <div class="c-paper-card">
+        <div class="c-paper-top">
+          <div>
+            <div class="c-paper-title">${esc(s.title)}</div>
+            <div class="c-paper-author">${esc(s.author)}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+            <span class="c-paper-badge">Community</span>
+            <span style="font-family:var(--f-mono);font-size:8px;letter-spacing:.1em;color:var(--dimmer)">${dateStr}</span>
+          </div>
+        </div>
+        ${s.abstract ? `<div class="c-paper-desc">${esc(s.abstract)}</div>` : ''}
+        ${s.filename ? `<div style="margin-top:12px;font-family:var(--f-mono);font-size:9px;letter-spacing:.1em;color:var(--dimmer);text-transform:uppercase">📎 ${esc(s.filename)}</div>` : ''}
+      </div>`;
+  });
+  addHoverEffect('.c-paper-card');
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+renderMyPapers();
+renderCommunityPapers();
+</script>
+</body>
+</html>
