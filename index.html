@@ -165,10 +165,10 @@ body::before{
 <div id="menu">
   <div class="menu-eyebrow">Navigate</div>
   <div class="menu-line"><a class="menu-item" href="flaperon.html">Project Flaperon</a></div>
-  <div class="menu-line"><span class="menu-item dim-item" onclick="soon('Lokhit Foundation')">Lokhit Foundation</span></div>
-  <div class="menu-line"><span class="menu-item dim-item" onclick="soon('School President')">School President</span></div>
-  <div class="menu-line"><span class="menu-item dim-item" onclick="soon('The Profile Two')">The Profile Two</span></div>
-  <div class="menu-line"><span class="menu-item dim-item" onclick="soon('Profound In')">Profound In</span></div>
+  <div class="menu-line"><a class="menu-item" href="lokhit.html">Lokhit Foundation</a></div>
+  <div class="menu-line"><a class="menu-item" href="president.html">School President</a></div>
+  <div class="menu-line"><a class="menu-item" href="profiletwo.html">The Profile Two</a></div>
+  <div class="menu-line"><a class="menu-item" href="profoundin.html">Profound In</a></div>
   <div class="menu-line"><span class="menu-item" onclick="downloadCV();toggleMenu()">Download CV ↗</span></div>
   <div class="menu-footer">www.aaravpandey.in</div>
 </div>
@@ -254,7 +254,7 @@ function snack(msg){
 function downloadCV(){
   const a=document.createElement('a');
   a.href='aarav_pandey_cv.pdf';          // ← put your CV file here as cv.pdf
-  a.download='aarav_pandey_cv.pdf';
+  a.download='Aarav_Pandey_CV.pdf';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
