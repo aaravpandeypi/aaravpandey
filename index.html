@@ -1,19 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AARAV PANDEY - Coming Soon</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aarav Pandey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#03030A;
+  --paper:#F2EFE9;
+  --parchment:#E8D5B0;
+  --dim:rgba(242,239,233,0.38);
+  --dimmer:rgba(242,239,233,0.18);
+  --f-display:'DM Serif Display',serif;
+  --f-mono:'Space Mono',monospace;
+  --f-body:'Inter',sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--void);
+  color:var(--paper);
+  font-family:var(--f-body);
+  cursor:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+/* noise */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.032;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px;
+}
+/* cursor */
+#cur{position:fixed;width:6px;height:6px;background:var(--paper);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+#cur-r{position:fixed;width:28px;height:28px;border:1px solid rgba(242,239,233,.2);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .07s,top .07s,width .2s,height .2s,border-color .2s}
+/* grid */
+#grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.022}
+/* hamburger */
+#ham{
+  position:fixed;top:30px;right:34px;z-index:5000;
+  width:36px;height:36px;display:flex;flex-direction:column;
+  justify-content:center;gap:6px;cursor:pointer;padding:4px;
+}
+#ham span{
+  display:block;height:1px;background:var(--paper);
+  transition:transform .42s cubic-bezier(.77,0,.175,1),opacity .3s,width .4s;
+  transform-origin:left center;
+}
+#ham span:nth-child(2){width:65%}
+#ham.open span:nth-child(1){transform:rotate(45deg) translate(1px,-1px)}
+#ham.open span:nth-child(2){opacity:0;width:0}
+#ham.open span:nth-child(3){transform:rotate(-45deg) translate(1px,1px)}
+/* menu */
+#menu{
+  position:fixed;inset:0;z-index:4000;background:var(--void);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  opacity:0;pointer-events:none;
+  transition:opacity .45s cubic-bezier(.77,0,.175,1);
+}
+#menu.open{opacity:1;pointer-events:all}
+.menu-eyebrow{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--dimmer);margin-bottom:44px;
+  transform:translateY(12px);opacity:0;
+  transition:transform .5s .04s cubic-bezier(.77,0,.175,1),opacity .5s .04s;
+}
+#menu.open .menu-eyebrow{transform:translateY(0);opacity:1}
+.menu-line{overflow:hidden;margin-bottom:2px}
+.menu-item{
+  display:block;
+  font-family:var(--f-display);
+  font-size:clamp(34px,5.5vw,72px);
+  color:var(--paper);line-height:1.1;letter-spacing:-.02em;
+  text-decoration:none;
+  transform:translateY(105%);
+  transition:transform .55s cubic-bezier(.77,0,.175,1),color .2s;
+  cursor:pointer;padding:3px 0;
+}
+.menu-item:hover{color:var(--parchment)}
+.menu-item.dim-item{color:var(--dim)}
+.menu-item.dim-item:hover{color:var(--paper)}
+#menu.open .menu-item{transform:translateY(0)}
+#menu.open .menu-line:nth-child(2) .menu-item{transition-delay:.06s}
+#menu.open .menu-line:nth-child(3) .menu-item{transition-delay:.1s}
+#menu.open .menu-line:nth-child(4) .menu-item{transition-delay:.14s}
+#menu.open .menu-line:nth-child(5) .menu-item{transition-delay:.18s}
+#menu.open .menu-line:nth-child(6) .menu-item{transition-delay:.22s}
+#menu.open .menu-line:nth-child(7) .menu-item{transition-delay:.26s}
+.menu-footer{
+  position:absolute;bottom:32px;
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;
+  color:var(--dimmer);text-transform:uppercase;
+}
+/* stage */
+#stage{position:relative;z-index:2;padding:0 48px;max-width:720px;width:100%}
+#name{
+  font-family:var(--f-display);
+  font-size:clamp(54px,9.5vw,124px);
+  line-height:.93;letter-spacing:-.03em;
+  color:var(--paper);
+  margin-bottom:40px;
+}
+#name-caret{
+  display:inline-block;width:3px;background:var(--paper);
+  vertical-align:middle;margin-left:5px;
+  animation:blink .85s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#roles{display:flex;flex-wrap:wrap;gap:9px;opacity:0;transition:opacity .5s}
+#roles.show{opacity:1}
+.role-tag{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim);padding:8px 15px;border:1px solid rgba(242,239,233,.09);
+  opacity:0;transform:translateY(7px);
+  transition:opacity .45s,transform .45s,color .2s,border-color .2s,background .2s;
+  cursor:default;
+}
+.role-tag.v{opacity:1;transform:translateY(0)}
+.role-tag:hover{color:var(--paper);border-color:rgba(242,239,233,.28);background:rgba(242,239,233,.03)}
+/* cv button */
+#cv-btn{
+  margin-top:36px;opacity:0;transition:opacity .5s;
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--void);background:var(--parchment);
+  border:none;padding:12px 24px;cursor:pointer;
+  transition:opacity .5s,background .2s,transform .15s;
+}
+#cv-btn.show{opacity:1}
+#cv-btn:hover{background:var(--paper);transform:translateY(-1px)}
+#domain{position:fixed;bottom:28px;left:34px;font-family:var(--f-mono);font-size:9px;letter-spacing:.18em;color:var(--dimmer);text-transform:uppercase;z-index:2}
+#clock{position:fixed;bottom:28px;right:34px;font-family:var(--f-mono);font-size:9px;letter-spacing:.14em;color:var(--dimmer);z-index:2}
+/* snackbar */
+#snack{
+  position:fixed;bottom:68px;left:50%;transform:translateX(-50%) translateY(6px);
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim);background:rgba(15,15,28,.95);border:1px solid rgba(242,239,233,.08);
+  padding:10px 20px;z-index:9990;opacity:0;pointer-events:none;
+  transition:opacity .3s,transform .3s;white-space:nowrap;
+}
+#snack.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:600px){
+  #ham{top:22px;right:22px}
+  #stage{padding:0 28px}
+  #domain,#clock{display:none}
+}
+</style>
 </head>
 <body>
-  <canvas id="dots-canvas"></canvas>
-  <canvas id="particle-canvas"></canvas>
-  <div class="container" role="main">
-    <h1 class="name" aria-label="Aarav Pandey">AARAV PANDEY</h1>
-    <p class="subtitle">COMING SOON</p>
-    <a class="email" href="mailto:aaravpandey@example.com"></a>
+<div id="cur"></div>
+<div id="cur-r"></div>
+<svg id="grid-bg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <defs><pattern id="g" width="72" height="72" patternUnits="userSpaceOnUse">
+    <path d="M72 0L0 0 0 72" fill="none" stroke="#F2EFE9" stroke-width=".4"/>
+  </pattern></defs>
+  <rect width="100%" height="100%" fill="url(#g)"/>
+</svg>
+
+<div id="ham" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+
+<div id="menu">
+  <div class="menu-eyebrow">Navigate</div>
+  <div class="menu-line"><a class="menu-item" href="flaperon.html">Project Flaperon</a></div>
+  <div class="menu-line"><span class="menu-item dim-item" onclick="soon('Lokhit Foundation')">Lokhit Foundation</span></div>
+  <div class="menu-line"><span class="menu-item dim-item" onclick="soon('School President')">School President</span></div>
+  <div class="menu-line"><span class="menu-item dim-item" onclick="soon('The Profile Two')">The Profile Two</span></div>
+  <div class="menu-line"><span class="menu-item dim-item" onclick="soon('Profound In')">Profound In</span></div>
+  <div class="menu-line"><span class="menu-item" onclick="downloadCV();toggleMenu()">Download CV ↗</span></div>
+  <div class="menu-footer">www.aaravpandey.in</div>
+</div>
+
+<div id="stage">
+  <div id="name"><span id="name-text"></span><span id="name-caret"></span></div>
+  <div id="roles">
+    <span class="role-tag">Aviation Researcher</span>
+    <span class="role-tag">Social Entrepreneur</span>
+    <span class="role-tag">School President</span>
+    <span class="role-tag">Android Developer</span>
+    <span class="role-tag">Photographer</span>
+    <span class="role-tag">UI/UX Designer</span>
   </div>
-  <script src="script.js"></script>
+  <button id="cv-btn" onclick="downloadCV()">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 1v7M3 5l3 3 3-3M1 10h10"/></svg>
+    Download CV
+  </button>
+</div>
+
+<div id="domain">aaravpandey.in</div>
+<div id="clock"></div>
+<div id="snack"></div>
+
+<script>
+// cursor
+const cur=document.getElementById('cur'),crr=document.getElementById('cur-r');
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
+  crr.style.left=e.clientX+'px';crr.style.top=e.clientY+'px';
+});
+function bigCursor(){crr.style.width='46px';crr.style.height='46px';crr.style.borderColor='rgba(232,213,176,.45)'}
+function resetCursor(){crr.style.width='28px';crr.style.height='28px';crr.style.borderColor='rgba(242,239,233,.2)'}
+document.querySelectorAll('#ham,.menu-item,.role-tag,#cv-btn').forEach(el=>{
+  el.addEventListener('mouseenter',bigCursor);el.addEventListener('mouseleave',resetCursor);
+});
+
+// typewriter
+const fullName='Aarav Pandey';
+const nt=document.getElementById('name-text'),nc=document.getElementById('name-caret');
+let i=0;
+function type(){
+  if(i<=fullName.length){
+    nt.textContent=fullName.slice(0,i++);
+    setTimeout(type,i===1?240:78);
+  } else {
+    setTimeout(()=>{nc.style.display='none'},700);
+    const roles=document.getElementById('roles');
+    roles.classList.add('show');
+    document.querySelectorAll('.role-tag').forEach((t,idx)=>{
+      setTimeout(()=>t.classList.add('v'),180+idx*80);
+    });
+    const cvBtn=document.getElementById('cv-btn');
+    setTimeout(()=>cvBtn.classList.add('show'),180+6*80+120);
+  }
+}
+setTimeout(type,320);
+
+// menu
+let open=false;
+function toggleMenu(){
+  open=!open;
+  document.getElementById('ham').classList.toggle('open',open);
+  document.getElementById('menu').classList.toggle('open',open);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&open)toggleMenu()});
+
+// clock
+function tick(){
+  document.getElementById('clock').textContent=
+    'IST '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+}
+tick();setInterval(tick,1000);
+
+// snack
+function snack(msg){
+  const el=document.getElementById('snack');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+// cv download — place your cv.pdf in the same folder, rename below if needed
+function downloadCV(){
+  const a=document.createElement('a');
+  a.href='cv.pdf';          // ← put your CV file here as cv.pdf
+  a.download='Aarav_Pandey_CV.pdf';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function soon(name){
+  if(open)toggleMenu();
+  snack(name+' — coming soon');
+}
+</script>
 </body>
 </html>
