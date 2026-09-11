@@ -1,269 +1,1015 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Aarav Pandey</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<title>Aarav Pandey / AP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --void:#03030A;
-  --paper:#F2EFE9;
-  --parchment:#E8D5B0;
-  --dim:rgba(242,239,233,0.38);
-  --dimmer:rgba(242,239,233,0.18);
-  --f-display:'DM Serif Display',serif;
-  --f-mono:'Space Mono',monospace;
-  --f-body:'Inter',sans-serif;
-}
-html,body{height:100%;overflow:hidden}
-body{
-  background:var(--void);
-  color:var(--paper);
-  font-family:var(--f-body);
-  cursor:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-/* noise */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.032;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:180px;
-}
-/* cursor */
-#cur{position:fixed;width:6px;height:6px;background:var(--paper);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
-#cur-r{position:fixed;width:28px;height:28px;border:1px solid rgba(242,239,233,.2);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .07s,top .07s,width .2s,height .2s,border-color .2s}
-/* grid */
-#grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.022}
-/* hamburger */
-#ham{
-  position:fixed;top:30px;right:34px;z-index:5000;
-  width:36px;height:36px;display:flex;flex-direction:column;
-  justify-content:center;gap:6px;cursor:pointer;padding:4px;
-}
-#ham span{
-  display:block;height:1px;background:var(--paper);
-  transition:transform .42s cubic-bezier(.77,0,.175,1),opacity .3s,width .4s;
-  transform-origin:left center;
-}
-#ham span:nth-child(2){width:65%}
-#ham.open span:nth-child(1){transform:rotate(45deg) translate(1px,-1px)}
-#ham.open span:nth-child(2){opacity:0;width:0}
-#ham.open span:nth-child(3){transform:rotate(-45deg) translate(1px,1px)}
-/* menu */
-#menu{
-  position:fixed;inset:0;z-index:4000;background:var(--void);
-  display:flex;align-items:center;justify-content:center;flex-direction:column;
-  opacity:0;pointer-events:none;
-  transition:opacity .45s cubic-bezier(.77,0,.175,1);
-}
-#menu.open{opacity:1;pointer-events:all}
-.menu-eyebrow{
-  font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;
-  text-transform:uppercase;color:var(--dimmer);margin-bottom:44px;
-  transform:translateY(12px);opacity:0;
-  transition:transform .5s .04s cubic-bezier(.77,0,.175,1),opacity .5s .04s;
-}
-#menu.open .menu-eyebrow{transform:translateY(0);opacity:1}
-.menu-line{overflow:hidden;margin-bottom:2px}
-.menu-item{
-  display:block;
-  font-family:var(--f-display);
-  font-size:clamp(34px,5.5vw,72px);
-  color:var(--paper);line-height:1.1;letter-spacing:-.02em;
-  text-decoration:none;
-  transform:translateY(105%);
-  transition:transform .55s cubic-bezier(.77,0,.175,1),color .2s;
-  cursor:pointer;padding:3px 0;
-}
-.menu-item:hover{color:var(--parchment)}
-.menu-item.dim-item{color:var(--dim)}
-.menu-item.dim-item:hover{color:var(--paper)}
-#menu.open .menu-item{transform:translateY(0)}
-#menu.open .menu-line:nth-child(2) .menu-item{transition-delay:.06s}
-#menu.open .menu-line:nth-child(3) .menu-item{transition-delay:.1s}
-#menu.open .menu-line:nth-child(4) .menu-item{transition-delay:.14s}
-#menu.open .menu-line:nth-child(5) .menu-item{transition-delay:.18s}
-#menu.open .menu-line:nth-child(6) .menu-item{transition-delay:.22s}
-#menu.open .menu-line:nth-child(7) .menu-item{transition-delay:.26s}
-.menu-footer{
-  position:absolute;bottom:32px;
-  font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;
-  color:var(--dimmer);text-transform:uppercase;
-}
-/* stage */
-#stage{position:relative;z-index:2;padding:0 48px;max-width:720px;width:100%}
-#name{
-  font-family:var(--f-display);
-  font-size:clamp(54px,9.5vw,124px);
-  line-height:.93;letter-spacing:-.03em;
-  color:var(--paper);
-  margin-bottom:40px;
-}
-#name-caret{
-  display:inline-block;width:3px;background:var(--paper);
-  vertical-align:middle;margin-left:5px;
-  animation:blink .85s step-end infinite;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-#roles{display:flex;flex-wrap:wrap;gap:9px;opacity:0;transition:opacity .5s}
-#roles.show{opacity:1}
-.role-tag{
-  font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--dim);padding:8px 15px;border:1px solid rgba(242,239,233,.09);
-  opacity:0;transform:translateY(7px);
-  transition:opacity .45s,transform .45s,color .2s,border-color .2s,background .2s;
-  cursor:default;
-}
-.role-tag.v{opacity:1;transform:translateY(0)}
-.role-tag:hover{color:var(--paper);border-color:rgba(242,239,233,.28);background:rgba(242,239,233,.03)}
-/* cv button */
-#cv-btn{
-  margin-top:36px;opacity:0;transition:opacity .5s;
-  display:inline-flex;align-items:center;gap:10px;
-  font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--void);background:var(--parchment);
-  border:none;padding:12px 24px;cursor:pointer;
-  transition:opacity .5s,background .2s,transform .15s;
-}
-#cv-btn.show{opacity:1}
-#cv-btn:hover{background:var(--paper);transform:translateY(-1px)}
-#domain{position:fixed;bottom:28px;left:34px;font-family:var(--f-mono);font-size:9px;letter-spacing:.18em;color:var(--dimmer);text-transform:uppercase;z-index:2}
-#clock{position:fixed;bottom:28px;right:34px;font-family:var(--f-mono);font-size:9px;letter-spacing:.14em;color:var(--dimmer);z-index:2}
-/* snackbar */
-#snack{
-  position:fixed;bottom:68px;left:50%;transform:translateX(-50%) translateY(6px);
-  font-family:var(--f-mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--dim);background:rgba(15,15,28,.95);border:1px solid rgba(242,239,233,.08);
-  padding:10px 20px;z-index:9990;opacity:0;pointer-events:none;
-  transition:opacity .3s,transform .3s;white-space:nowrap;
-}
-#snack.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:600px){
-  #ham{top:22px;right:22px}
-  #stage{padding:0 28px}
-  #domain,#clock{display:none}
-}
+  :root{
+    --cream:#f2ecdd;
+    --cream-2:#ece4d0;
+    --ink:#211c14;
+    --orange:#e2652b;
+    --orange-dark:#c1501e;
+    --sage:#b7c495;
+    --sage-dark:#8fa06a;
+    --line:#211c14;
+    --muted:#5c5546;
+    --body-font:'Space Grotesk', Arial, Helvetica, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    background-image:radial-gradient(var(--ink) .6px, transparent .6px);
+    background-size:16px 16px;
+    background-attachment:fixed;
+    color:var(--ink);
+    font-family:var(--body-font);
+    min-height:100vh;
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{transition-duration:.001ms !important; animation-duration:.001ms !important;}
+  }
+  h1,h2,h3,.pixel{
+    font-family:'Press Start 2P', monospace;
+    line-height:1.5;
+    letter-spacing:0.5px;
+  }
+  a{color:inherit;}
+  button{font-family:var(--body-font); cursor:pointer;}
+  .wrap{max-width:1200px; margin:0 auto; padding:0 32px;}
+  /* NAV */
+  header{position:sticky; top:0; z-index:50; background:var(--cream); border-bottom:3px solid var(--ink);}
+  .navbar{display:flex; align-items:center; justify-content:space-between; padding:20px 32px; max-width:1200px; margin:0 auto;}
+  .brand{display:flex; align-items:center; gap:12px; cursor:pointer;}
+  .brand .dot{width:12px; height:12px; background:var(--orange); transform:rotate(45deg);}
+  .brand span{font-family:'Press Start 2P', monospace; font-size:14px;}
+  nav.links{display:flex; gap:28px; align-items:center; flex-wrap:wrap;}
+  nav.links a{font-size:14px; font-weight:bold; text-decoration:none; padding:4px 2px; border-bottom:2px solid transparent; cursor:pointer; transition:border-color .2s ease, opacity .2s ease;}
+  nav.links a:hover{opacity:.65;}
+  nav.links a:hover, nav.links a.active{border-bottom:2px solid var(--orange);}
+  nav.links.open{animation:dropIn .22s ease;}
+  .mobile-toggle{display:none; font-size:22px; background:none; border:none; transition:transform .2s ease;}
+  .mobile-toggle:active{transform:scale(.9);}
+
+  #app{min-height:70vh; padding:120px 0 90px;}
+  @media(max-width:900px){ #app{padding:96px 0 70px;} }
+  #app{transition:opacity .32s ease, transform .32s ease; opacity:1; transform:translateY(0);}
+  #app.page-out{opacity:0; transform:translateY(10px);}
+  @keyframes dropIn{ from{opacity:0; transform:translateY(-8px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+
+  /* HERO */
+  .hero{display:grid; grid-template-columns:1.35fr 1fr; gap:56px; align-items:stretch;}
+  .eyebrow{font-size:12px; letter-spacing:1px; color:var(--muted); margin-bottom:18px; font-family:var(--body-font);}
+  .eyebrow .blink{display:inline-block; width:7px; height:7px; background:var(--orange); border-radius:50%; margin-right:6px;}
+  h1.display{font-size:58px; margin:0 0 28px; line-height:1.35;}
+  h1.display .accent{color:var(--orange);}
+  .lede{font-size:18px; line-height:1.7; color:#3a3426; max-width:60ch; margin-bottom:34px;}
+  .cta-row{display:flex; gap:18px; align-items:center; flex-wrap:wrap;}
+  .btn-solid{background:var(--orange); color:var(--cream); border:2px solid var(--ink); padding:14px 20px; font-weight:bold; text-decoration:none; box-shadow:4px 4px 0 var(--ink); display:inline-flex; gap:8px; align-items:center; transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease; cursor:pointer;}
+  .btn-solid:hover{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--ink);}
+  .btn-solid:active{transform:translate(4px,4px); box-shadow:0 0 0 var(--ink);}
+  .btn-line{text-decoration:none; font-weight:bold; border-bottom:2px solid var(--orange); padding-bottom:2px; transition:opacity .15s ease; cursor:pointer;}
+  .btn-line:hover{opacity:.65;}
+
+  .console{background:var(--sage); border:3px solid var(--ink); box-shadow:8px 8px 0 var(--ink); padding:26px 26px 30px; display:flex; flex-direction:column; justify-content:space-between; position:relative; animation:fadeUp .5s ease .05s both;}
+  .hero > div:first-child{animation:fadeUp .5s ease both;}
+  .console-top{display:flex; justify-content:space-between; font-size:11px; font-family:'Press Start 2P', monospace;}
+  .console-top .live{display:flex; align-items:center; gap:6px;}
+  .console-top .live::before{content:''; width:7px; height:7px; background:var(--ink); border-radius:50%; display:inline-block;}
+  .console-art{flex:1; display:flex; align-items:center; justify-content:center; padding:34px 0;}
+  .console-art svg{width:96px; height:96px;}
+  .console-tags{font-family:'Press Start 2P', monospace; font-size:14px; line-height:2.2;}
+  .console-foot{font-size:11px; font-family:'Press Start 2P', monospace; margin-top:22px; line-height:1.8; opacity:.8;}
+
+  .section-title{font-size:26px; margin:0 0 10px;}
+  .section-sub{color:var(--muted); font-size:15px; margin-bottom:36px; max-width:64ch;}
+  .page-head{margin-bottom:44px; animation:fadeUp .45s ease both;}
+
+  .btn-sm{background:var(--ink); color:var(--cream); border:none; padding:8px 14px; font-size:13px; font-weight:bold; transition:opacity .15s ease, transform .15s ease;}
+  .btn-sm.orange{background:var(--orange);}
+  .btn-sm.outline{background:transparent; color:var(--ink); border:2px solid var(--ink);}
+  .btn-sm:hover{opacity:.8;}
+  .btn-sm:active{transform:scale(.94);}
+  .admin-bar{background:var(--ink); color:var(--cream); font-size:12px; padding:8px 14px; display:flex; gap:10px; align-items:center; margin-bottom:28px; font-family:'Press Start 2P', monospace;}
+  .admin-bar .adot{width:8px;height:8px;background:var(--orange);border-radius:50%;}
+
+  /* BOXED INDEX + PANEL LAYOUT (used by Flaperon + MUN) */
+  .index-grid{display:grid; grid-template-columns:1.55fr 1fr; gap:24px; align-items:start;}
+  .index-box{border:2px solid var(--ink); background:var(--cream-2); box-shadow:6px 6px 0 var(--ink); padding:26px; animation:fadeUp .45s ease .05s both;}
+  .index-head{display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid var(--ink); padding-bottom:14px; margin-bottom:20px;}
+  .index-head .label{font-family:'Press Start 2P', monospace; font-size:11px;}
+  .index-head .tag{font-family:'Press Start 2P', monospace; font-size:10px; color:var(--muted);}
+
+  .panel-box{border:2px solid var(--ink); background:var(--sage); box-shadow:6px 6px 0 var(--ink); padding:26px; position:sticky; top:100px; animation:fadeUp .45s ease .1s both;}
+  .panel-box input, .panel-box textarea{transition:border-color .15s ease, box-shadow .15s ease;}
+  .panel-box input:focus, .panel-box textarea:focus{outline:none; border-color:var(--orange); box-shadow:0 0 0 3px rgba(226,101,43,.18);}
+  .panel-box .label{font-family:'Press Start 2P', monospace; font-size:10px; margin-bottom:16px; display:block;}
+  .panel-box h3{font-size:20px; margin:0 0 10px; font-family:var(--body-font); font-weight:bold;}
+  .panel-box p.desc{font-size:13.5px; color:#2c2818; margin:0 0 18px; line-height:1.6;}
+  .panel-box input, .panel-box textarea{width:100%; padding:11px; border:2px solid var(--ink); margin-bottom:12px; font-family:var(--body-font); font-size:13.5px; background:var(--cream);}
+  .panel-box textarea{min-height:80px; resize:vertical;}
+  .panel-box .dashed-zone{border:2px dashed var(--ink); padding:13px; font-size:12.5px; color:#2c2818; margin-bottom:14px; background:rgba(255,255,255,.28);}
+  .panel-box .submit-wide{width:100%; text-align:center; justify-content:center;}
+  .result-strip{background:var(--cream); border:2px solid var(--ink); padding:12px 14px; font-size:12.5px; margin-top:14px; word-break:break-all;}
+  .result-strip b{font-family:'Press Start 2P', monospace; font-size:11px; display:block; margin-bottom:6px;}
+  @media(max-width:900px){.index-grid{grid-template-columns:1fr;} .panel-box{position:static;}}
+
+  /* FLAPERON list rows inside index box */
+  .research-list{display:flex; flex-direction:column; gap:16px;}
+  .research-row{background:var(--cream); border:2px solid var(--ink); padding:18px 20px; display:flex; justify-content:space-between; gap:16px; align-items:flex-start; flex-wrap:wrap; transition:transform .15s ease, box-shadow .15s ease;}
+  .research-row:hover{transform:translate(-2px,-2px); box-shadow:3px 3px 0 var(--ink);}
+  .research-row h3{font-size:15px; margin:0 0 8px; font-family:var(--body-font); font-weight:bold;}
+  .research-row .meta{font-size:12px; color:var(--muted); margin-bottom:8px;}
+  .research-row p{font-size:14px; color:#3a3426; margin:0; max-width:60ch; line-height:1.6;}
+  .research-actions{display:flex; gap:8px; flex-shrink:0;}
+
+  /* PHOTOGRAPHY masonry */
+  .masonry{column-count:3; column-gap:18px;}
+  .masonry .ph{break-inside:avoid; margin-bottom:18px; border:2px solid var(--ink); background:var(--cream-2); position:relative; overflow:hidden; animation:fadeUp .4s ease both;}
+  .masonry .ph img{display:block; width:100%; height:auto; transition:transform .35s ease;}
+  .masonry .ph:hover img{transform:scale(1.045);}
+  .masonry .ph .cap{padding:10px 12px; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; gap:8px;}
+  @media(max-width:900px){.masonry{column-count:2;}}
+  @media(max-width:560px){.masonry{column-count:1;}}
+
+  /* PROJECTS / EXPERIENCE sections */
+  .block{border:2px solid var(--ink); background:var(--cream-2); padding:28px; margin-bottom:26px; box-shadow:5px 5px 0 var(--ink); animation:fadeUp .4s ease both; transition:transform .15s ease, box-shadow .15s ease;}
+  .block h3{font-size:17px; margin:0 0 14px; font-family:var(--body-font); font-weight:bold; border-bottom:2px solid var(--orange); display:inline-block; padding-bottom:6px;}
+  .block img{max-width:100%; height:auto; border:2px solid var(--ink); margin:14px 0;}
+  .block p{font-size:14.5px; line-height:1.7; color:#3a3426; margin:0 0 10px;}
+  .block a.link{color:var(--orange-dark); font-weight:bold; text-decoration:underline;}
+  .sub{border-left:3px solid var(--sage-dark); padding-left:16px; margin-top:18px;}
+  .sub h4{font-size:13px; margin:0 0 6px;}
+  .block-actions{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
+  .add-box{border:2px dashed var(--ink); background:transparent; padding:22px; text-align:center; margin-bottom:26px; cursor:pointer; color:var(--muted); font-size:13.5px; font-weight:bold; transition:background .18s ease, color .18s ease, transform .15s ease;}
+  .add-box:hover{background:var(--cream-2); color:var(--ink); transform:translateY(-2px);}
+  .add-box:active{transform:translateY(0);}
+
+  /* MUN conference tiles */
+  .conf-grid{display:flex; flex-direction:column; gap:14px;}
+  .conf-tile{border:2px solid var(--ink); background:var(--cream); padding:18px 20px; box-shadow:4px 4px 0 var(--ink); cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:14px; transition:transform .15s ease, box-shadow .15s ease;}
+  .conf-tile:hover{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--ink);}
+  .conf-tile .status{transition:background .15s ease;}
+  .conf-tile h3{font-size:14px; margin:0 0 6px; font-family:var(--body-font); font-weight:bold;}
+  .conf-tile .code{font-size:10px; color:var(--muted); font-family:'Press Start 2P',monospace;}
+  .conf-tile .status{font-size:11px; font-weight:bold; padding:5px 10px; border:2px solid var(--ink); white-space:nowrap;}
+  .conf-tile .status.live{background:var(--orange); color:var(--cream); border-color:var(--ink);}
+  .conf-tile .status.pending{background:transparent; color:var(--muted);}
+
+  table.marks{width:100%; border-collapse:collapse; background:var(--cream); border:2px solid var(--ink);}
+  table.marks th, table.marks td{border:1px solid var(--ink); padding:10px 12px; font-size:13px; text-align:left;}
+  table.marks th{background:var(--ink); color:var(--cream); font-size:11px; letter-spacing:.5px;}
+  table.marks input, table.marks select{width:100%; border:1px solid #999; padding:5px; font-size:13px; font-family:var(--body-font);}
+  .rc-present{color:#3a7d3a; font-weight:bold;}
+  .rc-pv{color:var(--orange-dark); font-weight:bold;}
+  .rc-absent{color:#a33; font-weight:bold;}
+
+  .chatbox{border:2px solid var(--ink); background:var(--cream); max-height:280px; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; margin-bottom:16px;}
+  .chatbox .msg{background:var(--cream-2); border-left:3px solid var(--orange); padding:8px 12px; font-size:13.5px;}
+  .chatbox .msg .ts{font-size:10px; color:var(--muted); margin-bottom:4px;}
+  .chat-input-row{display:flex; gap:10px;}
+  .chat-input-row input{flex:1; padding:10px; border:2px solid var(--ink); font-size:14px;}
+
+  .empty{color:var(--muted); font-size:14px; padding:24px 0; font-style:italic;}
+  footer{background:var(--ink); color:var(--cream); padding:64px 0 30px; margin-top:70px;}
+  footer .footer-grid{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:34px; padding-bottom:34px;}
+  footer .footer-eyebrow{font-size:11px; letter-spacing:1px; color:#cbbfa4; margin-bottom:18px; font-family:var(--body-font);}
+  footer h2.footer-heading{font-size:34px; color:var(--cream); margin:0; line-height:1.4;}
+  footer h2.footer-heading .accent{color:var(--orange);}
+  footer .footer-meta{text-align:right; font-size:12px; color:#cbbfa4; line-height:2;}
+  footer .footer-bottom{border-top:1px solid #3a3426; padding:20px 0 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; font-size:12px; color:#8a8168;}
+  footer .footer-nav-links{display:flex; gap:18px; flex-wrap:wrap;}
+  footer .footer-nav-links a{cursor:pointer; color:#cbbfa4; text-decoration:none; transition:color .15s ease;}
+  footer .footer-nav-links a:hover{color:var(--orange);}
+  footer .admin-link{cursor:pointer; text-decoration:underline; color:#cbbfa4;}
+  footer .admin-link:hover{color:var(--orange);}
+  @media(max-width:700px){ footer .footer-grid{align-items:flex-start;} footer .footer-meta{text-align:left;} footer h2.footer-heading{font-size:26px;} }
+  .back-link{display:inline-block; margin-bottom:24px; font-size:13px; font-weight:bold; text-decoration:none; border-bottom:2px solid var(--orange);}
+
+  /* MODALS (replace prompt/confirm/alert, which the sandboxed preview blocks) */
+  .modal-overlay{position:fixed; inset:0; background:rgba(33,28,20,0); z-index:400; display:flex; align-items:center; justify-content:center; padding:20px; transition:background .22s ease;}
+  .modal-overlay.show{background:rgba(33,28,20,.6);}
+  .modal-box{background:var(--cream); border:3px solid var(--ink); box-shadow:8px 8px 0 var(--ink); max-width:460px; width:100%; padding:28px; max-height:85vh; overflow-y:auto; opacity:0; transform:translateY(16px) scale(.98); transition:opacity .22s ease, transform .22s ease;}
+  .modal-overlay.show .modal-box{opacity:1; transform:translateY(0) scale(1);}
+  .modal-box h3{font-size:15px; margin:0 0 6px; font-family:var(--body-font); font-weight:bold;}
+  .modal-box .mdesc{font-size:13px; color:var(--muted); margin:0 0 18px; line-height:1.5;}
+  .modal-field{margin-bottom:15px;}
+  .modal-field label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:bold;}
+  .modal-field input, .modal-field textarea, .modal-field select{width:100%; padding:10px; border:2px solid var(--ink); font-size:14px; font-family:var(--body-font); background:var(--cream-2);}
+  .modal-field textarea{min-height:90px; resize:vertical;}
+  .modal-field.dashed input{border-style:dashed;}
+  .modal-field input[type=file]{border:2px dashed var(--ink); background:var(--cream); padding:16px 10px; cursor:pointer; font-size:12.5px;}
+  .modal-actions{display:flex; gap:10px; justify-content:flex-end; margin-top:20px;}
+  .modal-cancel{background:transparent; border:2px solid var(--ink); padding:10px 16px; font-weight:bold; font-size:13px;}
+  .modal-submit{background:var(--orange); color:var(--cream); border:2px solid var(--ink); padding:10px 16px; font-weight:bold; font-size:13px; box-shadow:3px 3px 0 var(--ink);}
+  .modal-submit.danger{background:#a33;}
+
+  .toast{position:fixed; bottom:24px; right:24px; background:var(--ink); color:var(--cream); padding:14px 20px; font-size:13px; border:2px solid var(--orange); z-index:500; opacity:0; transform:translateY(14px) scale(.97); transition:opacity .28s cubic-bezier(.2,.9,.3,1.2), transform .28s cubic-bezier(.2,.9,.3,1.2); max-width:320px;}
+  .toast.show{opacity:1; transform:translateY(0) scale(1);}
+  .file-picked{font-size:12px; color:var(--muted); margin-top:-8px; margin-bottom:14px;}
+
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;}
+    nav.links{display:none;}
+    .mobile-toggle{display:block;}
+    h1.display{font-size:36px;}
+    .masonry{column-count:2;}
+  }
+  @media(max-width:900px){
+    nav.links.open{display:flex; flex-direction:column; position:absolute; top:74px; left:0; right:0; background:var(--cream); border-bottom:3px solid var(--ink); padding:20px 32px; gap:16px;}
+  }
 </style>
 </head>
 <body>
-<div id="cur"></div>
-<div id="cur-r"></div>
-<svg id="grid-bg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-  <defs><pattern id="g" width="72" height="72" patternUnits="userSpaceOnUse">
-    <path d="M72 0L0 0 0 72" fill="none" stroke="#F2EFE9" stroke-width=".4"/>
-  </pattern></defs>
-  <rect width="100%" height="100%" fill="url(#g)"/>
-</svg>
-
-<div id="ham" onclick="toggleMenu()"><span></span><span></span><span></span></div>
-
-<div id="menu">
-  <div class="menu-eyebrow">Navigate</div>
-  <div class="menu-line"><a class="menu-item" href="flaperon.html">Project Flaperon</a></div>
-  <div class="menu-line"><a class="menu-item" href="lokhit.html">Lokhit Foundation</a></div>
-  <div class="menu-line"><a class="menu-item" href="president.html">School President</a></div>
-  <div class="menu-line"><a class="menu-item" href="profiletwo.html">The Profile Two</a></div>
-  <div class="menu-line"><a class="menu-item" href="profoundin.html">Profound In</a></div>
-  <div class="menu-line"><span class="menu-item" onclick="downloadCV();toggleMenu()">Download CV ↗</span></div>
-  <div class="menu-footer">www.aaravpandey.in</div>
-</div>
-
-<div id="stage">
-  <div id="name"><span id="name-text"></span><span id="name-caret"></span></div>
-  <div id="roles">
-    <span class="role-tag">Aviation Researcher</span>
-    <span class="role-tag">Social Entrepreneur</span>
-    <span class="role-tag">School President</span>
-    <span class="role-tag">Android Developer</span>
-    <span class="role-tag">Photographer</span>
-    <span class="role-tag">UI/UX Designer</span>
+<header>
+  <div class="navbar">
+    <div class="brand" onclick="go('home')">
+      <div class="dot"></div>
+      <span>AARAV / AP</span>
+    </div>
+    <nav class="links" id="navLinks">
+      <a onclick="go('home')" data-p="home">Home</a>
+      <a onclick="go('flaperon')" data-p="flaperon">Flaperon</a>
+      <a onclick="go('mun')" data-p="mun">MUN</a>
+      <a onclick="go('photography')" data-p="photography">Photography</a>
+      <a onclick="go('projects')" data-p="projects">Projects</a>
+      <a onclick="go('experience')" data-p="experience">Experience</a>
+    </nav>
+    <button class="mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
   </div>
-  <button id="cv-btn" onclick="downloadCV()">
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 1v7M3 5l3 3 3-3M1 10h10"/></svg>
-    Download CV
-  </button>
-</div>
+</header>
 
-<div id="domain">aaravpandey.in</div>
-<div id="clock"></div>
-<div id="snack"></div>
+<main class="wrap" id="app"></main>
+
+<footer>
+  <div class="wrap footer-grid">
+    <div>
+      <div class="footer-eyebrow">ORANGE CARTRIDGE / 01</div>
+      <h2 class="footer-heading">Make the room<br><span class="accent">worth entering.</span></h2>
+    </div>
+    <div class="footer-meta">
+      <div>&copy; 2026 Aarav Pandey</div>
+      <div>MUN &middot; aviation &middot; image-making</div>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <div class="footer-nav-links">
+      <a onclick="go('home')">Home</a>
+      <a onclick="go('flaperon')">Flaperon</a>
+      <a onclick="go('mun')">MUN</a>
+      <a onclick="go('photography')">Photography</a>
+      <a onclick="go('projects')">Projects</a>
+      <a onclick="go('experience')">Experience</a>
+    </div>
+    <span class="admin-link" onclick="toggleAdmin()" id="adminToggleLabel">Admin</span>
+  </div>
+</footer>
+
+<div id="modalRoot"></div>
 
 <script>
-// cursor
-const cur=document.getElementById('cur'),crr=document.getElementById('cur-r');
-document.addEventListener('mousemove',e=>{
-  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
-  crr.style.left=e.clientX+'px';crr.style.top=e.clientY+'px';
-});
-function bigCursor(){crr.style.width='46px';crr.style.height='46px';crr.style.borderColor='rgba(232,213,176,.45)'}
-function resetCursor(){crr.style.width='28px';crr.style.height='28px';crr.style.borderColor='rgba(242,239,233,.2)'}
-document.querySelectorAll('#ham,.menu-item,.role-tag,#cv-btn').forEach(el=>{
-  el.addEventListener('mouseenter',bigCursor);el.addEventListener('mouseleave',resetCursor);
-});
+/* ---------------- STATE & STORAGE HELPERS ---------------- */
+const state = { page:'home', munCode:null, isAdmin:false };
 
-// typewriter
-const fullName='Aarav Pandey';
-const nt=document.getElementById('name-text'),nc=document.getElementById('name-caret');
-let i=0;
-function type(){
-  if(i<=fullName.length){
-    nt.textContent=fullName.slice(0,i++);
-    setTimeout(type,i===1?240:78);
-  } else {
-    setTimeout(()=>{nc.style.display='none'},700);
-    const roles=document.getElementById('roles');
-    roles.classList.add('show');
-    document.querySelectorAll('.role-tag').forEach((t,idx)=>{
-      setTimeout(()=>t.classList.add('v'),180+idx*80);
+async function sget(key){
+  try{ const r = await window.storage.get(key, true); return r ? JSON.parse(r.value) : null; }
+  catch(e){ return null; }
+}
+async function sset(key, value){
+  try{ await window.storage.set(key, JSON.stringify(value), true); return true; }
+  catch(e){ console.error(e); return false; }
+}
+
+function go(page, extra){
+  state.page = page;
+  if(extra) Object.assign(state, extra);
+  document.getElementById('navLinks').classList.remove('open');
+  document.querySelectorAll('nav.links a').forEach(a=>a.classList.toggle('active', a.dataset.p===page));
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function genCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c=''; for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+  return c;
+}
+function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ---------------- MODAL SYSTEM (replaces prompt/confirm/alert) ---------------- */
+function resizeImageToDataURL(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = ()=>{
+        let {width, height} = img;
+        if(width > maxDim || height > maxDim){
+          if(width > height){ height = Math.round(height * maxDim / width); width = maxDim; }
+          else { width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function openFormModal(opts){
+  return new Promise(resolve=>{
+    const root = document.getElementById('modalRoot');
+    const fieldsHtml = opts.fields.map(f=>{
+      if(f.type==='textarea'){
+        return `<div class="modal-field"><label>${esc(f.label)}</label><textarea id="mf-${f.name}" placeholder="${esc(f.placeholder||'')}">${esc(f.value||'')}</textarea></div>`;
+      } else if(f.type==='select'){
+        return `<div class="modal-field"><label>${esc(f.label)}</label><select id="mf-${f.name}">${f.options.map(o=>`<option value="${esc(o)}" ${o===f.value?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`;
+      } else if(f.type==='password'){
+        return `<div class="modal-field"><label>${esc(f.label)}</label><input type="password" id="mf-${f.name}" value="${esc(f.value||'')}"></div>`;
+      } else if(f.type==='file'){
+        return `<div class="modal-field"><label>${esc(f.label)}</label><input type="file" accept="image/*" id="mf-${f.name}" onchange="document.getElementById('fp-${f.name}').textContent = this.files[0] ? this.files[0].name : ''"><div class="file-picked" id="fp-${f.name}"></div></div>`;
+      } else {
+        return `<div class="modal-field ${f.dashed?'dashed':''}"><label>${esc(f.label)}</label><input type="text" id="mf-${f.name}" value="${esc(f.value||'')}" placeholder="${esc(f.placeholder||'')}"></div>`;
+      }
+    }).join('');
+    root.innerHTML = `
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-box">
+        <h3>${esc(opts.title)}</h3>
+        ${opts.desc?`<p class="mdesc">${esc(opts.desc)}</p>`:''}
+        ${fieldsHtml}
+        <div class="modal-actions">
+          <button class="modal-cancel" id="modalCancelBtn" type="button">Cancel</button>
+          <button class="modal-submit" id="modalSubmitBtn" type="button">${esc(opts.submitLabel||'Save')}</button>
+        </div>
+      </div>
+    </div>`;
+    const overlay = document.getElementById('modalOverlay');
+    requestAnimationFrame(()=>overlay.classList.add('show'));
+    const close = (val)=>{
+      overlay.classList.remove('show');
+      setTimeout(()=>{ root.innerHTML=''; resolve(val); }, 200);
+    };
+    document.getElementById('modalCancelBtn').onclick = ()=>close(null);
+    overlay.onclick = (e)=>{ if(e.target.id==='modalOverlay') close(null); };
+    document.getElementById('modalSubmitBtn').onclick = async ()=>{
+      const btn = document.getElementById('modalSubmitBtn');
+      const originalLabel = btn.textContent;
+      const values = {};
+      let hasFileField = opts.fields.some(f=>f.type==='file');
+      if(hasFileField){ btn.textContent = 'Processing...'; btn.disabled = true; }
+      for(const f of opts.fields){
+        const el = document.getElementById('mf-'+f.name);
+        if(f.type==='file'){
+          const file = el.files && el.files[0];
+          if(file){
+            try{ values[f.name] = await resizeImageToDataURL(file, 1600, 0.82); }
+            catch(e){ values[f.name] = null; }
+          } else { values[f.name] = null; }
+        } else {
+          values[f.name] = el.value.trim();
+        }
+      }
+      if(hasFileField){ btn.textContent = originalLabel; btn.disabled = false; }
+      close(values);
+    };
+  });
+}
+function openConfirmModal(message, danger){
+  return new Promise(resolve=>{
+    const root = document.getElementById('modalRoot');
+    root.innerHTML = `
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-box">
+        <h3>Are you sure?</h3>
+        <p class="mdesc">${esc(message)}</p>
+        <div class="modal-actions">
+          <button class="modal-cancel" id="modalCancelBtn" type="button">Cancel</button>
+          <button class="modal-submit ${danger?'danger':''}" id="modalSubmitBtn" type="button">Confirm</button>
+        </div>
+      </div>
+    </div>`;
+    const overlay = document.getElementById('modalOverlay');
+    requestAnimationFrame(()=>overlay.classList.add('show'));
+    const close = (val)=>{
+      overlay.classList.remove('show');
+      setTimeout(()=>{ root.innerHTML=''; resolve(val); }, 200);
+    };
+    document.getElementById('modalCancelBtn').onclick = ()=>close(false);
+    overlay.onclick = (e)=>{ if(e.target.id==='modalOverlay') close(false); };
+    document.getElementById('modalSubmitBtn').onclick = ()=>close(true);
+  });
+}
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className='toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),300); }, 3200);
+}
+
+/* ---------------- ADMIN TOGGLE ---------------- */
+async function toggleAdmin(){
+  if(state.isAdmin){
+    state.isAdmin = false;
+    document.getElementById('adminToggleLabel').textContent = 'Admin';
+    render();
+    return;
+  }
+  const saved = await sget('site:admin-passcode');
+  if(!saved){
+    const v = await openFormModal({
+      title:'Set up your admin passcode',
+      desc:"You'll use this to edit pages and publish MUN marksheets. Keep it safe — anyone with it can edit the site.",
+      fields:[{name:'p', label:'Choose a passcode', type:'password'}],
+      submitLabel:'Set passcode'
     });
-    const cvBtn=document.getElementById('cv-btn');
-    setTimeout(()=>cvBtn.classList.add('show'),180+6*80+120);
+    if(!v || !v.p) return;
+    await sset('site:admin-passcode', v.p);
+    state.isAdmin = true;
+    showToast('Admin passcode set — you are now in admin mode.');
+  } else {
+    const v = await openFormModal({ title:'Enter admin passcode', fields:[{name:'p', label:'Passcode', type:'password'}], submitLabel:'Enter' });
+    if(!v) return;
+    if(v.p === saved){ state.isAdmin = true; showToast('Admin mode on.'); }
+    else { showToast('Incorrect passcode.'); return; }
+  }
+  document.getElementById('adminToggleLabel').textContent = 'Admin: ON';
+  render();
+}
+
+/* ---------------- RENDER ROUTER ---------------- */
+let renderToken = 0;
+async function render(){
+  const app = document.getElementById('app');
+  const myToken = ++renderToken;
+  app.classList.add('page-out');
+  let html = '';
+  if(state.page==='home') html = pageHome();
+  else if(state.page==='flaperon') html = await pageFlaperon();
+  else if(state.page==='mun') html = await pageMunList();
+  else if(state.page==='mun-detail') html = await pageMunDetail(state.munCode);
+  else if(state.page==='photography') html = await pagePhotography();
+  else if(state.page==='projects') html = await pageProjects();
+  else if(state.page==='experience') html = await pageExperience();
+  if(myToken !== renderToken) return; // a newer render started; drop this one
+  app.innerHTML = html;
+  void app.offsetWidth;
+  app.classList.remove('page-out');
+}
+
+/* ---------------- HOME ---------------- */
+function pageHome(){
+  return `
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><span class="blink"></span>AARAV PANDEY / FIELD NOTE 001</div>
+      <h1 class="display">Strategy,<br><span class="accent">with a</span><br><span class="accent">pulse.</span></h1>
+      <p class="lede">Aarav Pandey is a distinguished MUNer, student leader, and entrepreneur known for his strategic
+      thinking and diplomatic leadership. As President of his school's Student Council, founder of multiple
+      initiatives, and a recipient of accolades across national MUN circuits, he brings a rare blend of
+      parliamentary expertise, policy-driven debate, and a genuine commitment to fostering meaningful dialogue
+      inside &mdash; and outside &mdash; the committee room.</p>
+      <div class="cta-row">
+        <a class="btn-solid" onclick="go('projects')">Explore the work &#8599;</a>
+        <a class="btn-line" onclick="go('experience')">Read the experience &rarr;</a>
+      </div>
+    </div>
+    <div class="console">
+      <div class="console-top"><span>AP_SYSTEM</span><span class="live">ONLINE</span></div>
+      <div class="console-art">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 55 L55 50 L90 30 L95 35 L70 55 L95 58 L92 64 L62 62 L45 78 L52 80 L50 84 L30 82 L28 70 L10 55 Z" fill="#211c14"/>
+        </svg>
+      </div>
+      <div class="console-tags">STUDENT LEADER<br>MUNER / FOUNDER<br>AVIATION RESEARCHER</div>
+      <div class="console-foot">PRESS START TO<br>EXPLORE &darr;</div>
+    </div>
+  </section>`;
+}
+
+/* ---------------- FLAPERON (aviation research) ---------------- */
+async function pageFlaperon(){
+  const list = (await sget('flaperon:research')) || [];
+  const admin = state.isAdmin;
+  const rows = list.length ? list.map(r=>`
+    <div class="research-row">
+      <div>
+        <h3>${esc(r.title)}</h3>
+        <div class="meta">${esc(r.date||'')}${r.author? ' &middot; '+esc(r.author):''}</div>
+        <p>${esc(r.summary)}</p>
+      </div>
+      <div class="research-actions">
+        <a class="btn-sm orange" style="text-decoration:none;" href="${esc(r.link)}" target="_blank" rel="noopener">Download</a>
+        ${admin?`<button class="btn-sm outline" onclick="editResearch('${r.id}')">Edit</button>
+        <button class="btn-sm outline" onclick="deleteResearch('${r.id}')">Delete</button>`:''}
+      </div>
+    </div>`).join('') : `<div class="empty">No research published yet.</div>`;
+
+  const indexBox = `
+    <div class="index-box">
+      <div class="index-head"><span class="label">PUBLICATION INDEX</span><span class="tag">ARCHIVE / OPEN</span></div>
+      <div class="research-list">${rows}</div>
+    </div>`;
+
+  const panel = admin ? `
+    <div class="panel-box">
+      <span class="label">ADMIN ENTRY</span>
+      <h3>Add research</h3>
+      <p class="desc">Publish a new paper to the archive. Add a link to the file — Drive, Dropbox, or anywhere it's hosted.</p>
+      <input id="pf-title" placeholder="Research title">
+      <textarea id="pf-summary" placeholder="Short summary / abstract"></textarea>
+      <div class="dashed-zone">Paste a link to the file below &mdash; that's what visitors will use to download it.</div>
+      <input id="pf-link" placeholder="https://drive.google.com/...">
+      <button class="btn-solid submit-wide" onclick="addResearch()">Publish to archive</button>
+    </div>` : '';
+
+  return `
+  <div class="page-head">
+    <div class="eyebrow">PROJECT FLAPERON / AVIATION</div>
+    <h2 class="section-title">Research, cleared for takeoff.</h2>
+    <p class="section-sub">Technical notes, aviation curiosities, and papers from an ongoing flight log.</p>
+  </div>
+  ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; you can add, edit and remove research</div>`:''}
+  <div class="index-grid">${indexBox}${panel}</div>`;
+}
+
+async function addResearch(){
+  const title = document.getElementById('pf-title').value.trim();
+  const summary = document.getElementById('pf-summary').value.trim();
+  const link = document.getElementById('pf-link').value.trim();
+  if(!title || !link){ showToast('Title and a file link are required.'); return; }
+  const date = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+  const list = (await sget('flaperon:research')) || [];
+  list.unshift({id:uid(), title, summary, link, author:'Aarav Pandey', date});
+  await sset('flaperon:research', list);
+  showToast('Research published.');
+  render();
+}
+async function editResearch(id){
+  const list = (await sget('flaperon:research')) || [];
+  const r = list.find(x=>x.id===id); if(!r) return;
+  const v = await openFormModal({
+    title:'Edit research',
+    fields:[
+      {name:'title', label:'Title', value:r.title},
+      {name:'summary', label:'Summary', type:'textarea', value:r.summary},
+      {name:'link', label:'Link to file', value:r.link, dashed:true}
+    ], submitLabel:'Save changes'});
+  if(!v) return;
+  Object.assign(r, v);
+  await sset('flaperon:research', list);
+  showToast('Research updated.');
+  render();
+}
+async function deleteResearch(id){
+  const ok = await openConfirmModal('This research entry will be removed from the public archive.', true);
+  if(!ok) return;
+  let list = (await sget('flaperon:research')) || [];
+  list = list.filter(x=>x.id!==id);
+  await sset('flaperon:research', list);
+  render();
+}
+
+/* ---------------- PHOTOGRAPHY ---------------- */
+async function pagePhotography(){
+  const list = (await sget('photography:images')) || [];
+  const admin = state.isAdmin;
+  let tiles = '';
+  if(list.length){
+    const withUrls = await Promise.all(list.map(async p => ({ ...p, url: await sget('photography:img:'+p.id) })));
+    tiles = withUrls.filter(p=>p.url).map((p,i)=>`
+      <div class="ph" style="animation-delay:${Math.min(i*0.04,0.4)}s;">
+        <img src="${p.url}" alt="${esc(p.caption)}" loading="lazy">
+        <div class="cap"><span>${esc(p.caption||'')}</span>${admin?`<button class="btn-sm outline" onclick="deletePhoto('${p.id}')">&times;</button>`:''}</div>
+      </div>`).join('');
+  }
+  if(!tiles) tiles = `<div class="empty">No photos uploaded yet.</div>`;
+  return `
+  <div class="page-head">
+    <div class="eyebrow">PHOTOGRAPHY</div>
+    <h2 class="section-title">Frames from Project Flaperon.</h2>
+    <p class="section-sub">A visual log &mdash; shot, developed, and filed by Aarav.</p>
+  </div>
+  ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; upload photos below</div>
+  <div class="add-box" onclick="addPhoto()">+ Upload a photo</div>`:''}
+  <div class="masonry">${tiles}</div>`;
+}
+async function addPhoto(){
+  const v = await openFormModal({
+    title:'Upload a photo',
+    desc:'Pick an image from your device. It will be resized for the web automatically.',
+    fields:[{name:'file', label:'Choose an image', type:'file'}, {name:'caption', label:'Caption (optional)'}],
+    submitLabel:'Upload'
+  });
+  if(!v) return;
+  if(!v.file){ showToast('Choose an image to upload.'); return; }
+  const id = uid();
+  const saved = await sset('photography:img:'+id, v.file);
+  if(!saved){ showToast('That image was too large — try a smaller photo.'); return; }
+  const list = (await sget('photography:images')) || [];
+  list.unshift({id, caption:v.caption});
+  await sset('photography:images', list);
+  showToast('Photo uploaded.');
+  render();
+}
+async function deletePhoto(id){
+  const ok = await openConfirmModal('This photo will be removed from the gallery.', true);
+  if(!ok) return;
+  let list = (await sget('photography:images')) || [];
+  list = list.filter(x=>x.id!==id);
+  await sset('photography:images', list);
+  try{ await window.storage.delete('photography:img:'+id, true); }catch(e){}
+  render();
+}
+
+/* ---------------- PROJECTS ---------------- */
+async function pageProjects(){
+  const list = (await sget('projects:sections')) || [];
+  const admin = state.isAdmin;
+  const blocks = list.length ? list.map(s=>`
+    <div class="block">
+      <h3>${esc(s.heading)}</h3>
+      ${s.imageUrl?`<img src="${esc(s.imageUrl)}" alt="">`:''}
+      ${s.body?`<p>${esc(s.body).replace(/\n/g,'<br>')}</p>`:''}
+      ${s.linkUrl?`<p><a class="link" href="${esc(s.linkUrl)}" target="_blank" rel="noopener">${esc(s.linkLabel||s.linkUrl)} &rarr;</a></p>`:''}
+      ${admin?`<div class="block-actions">
+        <button class="btn-sm outline" onclick="editProject('${s.id}')">Edit</button>
+        <button class="btn-sm outline" onclick="deleteProject('${s.id}')">Delete</button>
+      </div>`:''}
+    </div>`).join('') : `<div class="empty">No project sections yet.</div>`;
+  return `
+  <div class="page-head">
+    <div class="eyebrow">PROJECTS</div>
+    <h2 class="section-title">What Aarav has built.</h2>
+    <p class="section-sub">Paragraphs, pictures and links, added as new work happens.</p>
+  </div>
+  ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; add and edit sections</div>
+  <div class="add-box" onclick="addProject()">+ Add a section</div>`:''}
+  ${blocks}`;
+}
+async function addProject(){
+  const v = await openFormModal({
+    title:'Add project section',
+    fields:[
+      {name:'heading', label:'Heading'},
+      {name:'body', label:'Paragraph (optional)', type:'textarea'},
+      {name:'imageUrl', label:'Image URL (optional)', dashed:true},
+      {name:'linkUrl', label:'Link URL (optional)'},
+      {name:'linkLabel', label:'Link label (optional)'}
+    ], submitLabel:'Add section'});
+  if(!v || !v.heading) return;
+  const list = (await sget('projects:sections')) || [];
+  list.push({id:uid(), ...v});
+  await sset('projects:sections', list);
+  render();
+}
+async function editProject(id){
+  const list = (await sget('projects:sections')) || [];
+  const s = list.find(x=>x.id===id); if(!s) return;
+  const v = await openFormModal({
+    title:'Edit section',
+    fields:[
+      {name:'heading', label:'Heading', value:s.heading},
+      {name:'body', label:'Paragraph', type:'textarea', value:s.body},
+      {name:'imageUrl', label:'Image URL', value:s.imageUrl, dashed:true},
+      {name:'linkUrl', label:'Link URL', value:s.linkUrl},
+      {name:'linkLabel', label:'Link label', value:s.linkLabel}
+    ], submitLabel:'Save changes'});
+  if(!v) return;
+  Object.assign(s, v);
+  await sset('projects:sections', list);
+  render();
+}
+async function deleteProject(id){
+  const ok = await openConfirmModal('This section will be removed from the Projects page.', true);
+  if(!ok) return;
+  let list = (await sget('projects:sections')) || [];
+  list = list.filter(x=>x.id!==id);
+  await sset('projects:sections', list);
+  render();
+}
+
+/* ---------------- EXPERIENCE ---------------- */
+async function pageExperience(){
+  const list = (await sget('experience:sections')) || [];
+  const admin = state.isAdmin;
+  const blocks = list.length ? list.map(s=>`
+    <div class="block">
+      <h3>${esc(s.title)}</h3>
+      ${(s.subsections||[]).map((sub,i)=>`
+        <div class="sub">
+          <h4>${esc(sub.heading)}</h4>
+          <p>${esc(sub.body).replace(/\n/g,'<br>')}</p>
+          ${admin?`<button class="btn-sm outline" onclick="deleteSub('${s.id}',${i})">Remove subsection</button>`:''}
+        </div>`).join('')}
+      ${admin?`<div class="block-actions">
+        <button class="btn-sm outline" onclick="addSub('${s.id}')">+ Add subsection</button>
+        <button class="btn-sm outline" onclick="editExpTitle('${s.id}')">Edit title</button>
+        <button class="btn-sm outline" onclick="deleteExp('${s.id}')">Delete section</button>
+      </div>`:''}
+    </div>`).join('') : `<div class="empty">No experience sections yet.</div>`;
+  return `
+  <div class="page-head">
+    <div class="eyebrow">MUN EXPERIENCE</div>
+    <h2 class="section-title">The parliamentary record.</h2>
+    <p class="section-sub">Each boundary below is one chapter of the experience, broken into its own moments.</p>
+  </div>
+  ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; add sections and subsections</div>
+  <div class="add-box" onclick="addExp()">+ Add a section</div>`:''}
+  ${blocks}`;
+}
+async function addExp(){
+  const v = await openFormModal({title:'Add experience section', fields:[{name:'title', label:'Section title', placeholder:'e.g. Conference Highlights'}], submitLabel:'Add section'});
+  if(!v || !v.title) return;
+  const list = (await sget('experience:sections')) || [];
+  list.push({id:uid(), title:v.title, subsections:[]});
+  await sset('experience:sections', list);
+  render();
+}
+async function editExpTitle(id){
+  const list = (await sget('experience:sections')) || [];
+  const s = list.find(x=>x.id===id); if(!s) return;
+  const v = await openFormModal({title:'Edit section title', fields:[{name:'title', label:'Title', value:s.title}], submitLabel:'Save'});
+  if(!v || !v.title) return;
+  s.title = v.title;
+  await sset('experience:sections', list);
+  render();
+}
+async function deleteExp(id){
+  const ok = await openConfirmModal('This whole section and its subsections will be removed.', true);
+  if(!ok) return;
+  let list = (await sget('experience:sections')) || [];
+  list = list.filter(x=>x.id!==id);
+  await sset('experience:sections', list);
+  render();
+}
+async function addSub(id){
+  const v = await openFormModal({title:'Add subsection', fields:[{name:'heading', label:'Heading'}, {name:'body', label:'Text', type:'textarea'}], submitLabel:'Add'});
+  if(!v || !v.heading) return;
+  const list = (await sget('experience:sections')) || [];
+  const s = list.find(x=>x.id===id); if(!s) return;
+  s.subsections = s.subsections || [];
+  s.subsections.push({heading:v.heading, body:v.body});
+  await sset('experience:sections', list);
+  render();
+}
+async function deleteSub(id, idx){
+  const ok = await openConfirmModal('This subsection will be removed.', true);
+  if(!ok) return;
+  const list = (await sget('experience:sections')) || [];
+  const s = list.find(x=>x.id===id); if(!s) return;
+  s.subsections.splice(idx,1);
+  await sset('experience:sections', list);
+  render();
+}
+
+/* ---------------- MUN ---------------- */
+async function pageMunList(){
+  const confs = (await sget('mun:conferences')) || [];
+  const admin = state.isAdmin;
+
+  let tiles = '';
+  if(confs.length){
+    for(const c of confs){
+      const data = await sget('mun:conf:'+c.code);
+      const live = data && data.published;
+      tiles += `
+      <div class="conf-tile" onclick="go('mun-detail', {munCode:'${c.code}'})">
+        <div>
+          <h3>${esc(c.name)}</h3>
+          <div class="code">CODE // ${c.code}</div>
+        </div>
+        <span class="status ${live?'live':'pending'}">${live?'PUBLISHED':'PENDING'}</span>
+      </div>`;
+    }
+  } else {
+    tiles = `<div class="empty">No conferences added yet.</div>`;
+  }
+
+  const indexBox = `
+    <div class="index-box">
+      <div class="index-head"><span class="label">CONFERENCE INDEX</span><span class="tag">MUN / RECORDS</span></div>
+      <div class="conf-grid">${tiles}</div>
+    </div>`;
+
+  const panel = admin ? `
+    <div class="panel-box">
+      <span class="label">ADMIN ENTRY</span>
+      <h3>New conference</h3>
+      <p class="desc">Creates a permanent access code for this conference. You'll build its marksheet next, and publish it when it's ready for delegates to see.</p>
+      <input id="mc-name" placeholder="Conference name, e.g. DHSMUN 2026">
+      <button class="btn-solid submit-wide" onclick="addConf()">Create conference</button>
+      <div id="mc-result"></div>
+    </div>` : '';
+
+  return `
+  <div class="page-head">
+    <div class="eyebrow">MODEL UNITED NATIONS</div>
+    <h2 class="section-title">Conference records.</h2>
+    <p class="section-sub">Pick a conference to view its marksheet, once it has been published.</p>
+  </div>
+  ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE</div>`:''}
+  <div class="index-grid">${indexBox}${panel}</div>`;
+}
+async function addConf(){
+  const name = document.getElementById('mc-name').value.trim();
+  if(!name){ showToast('Give the conference a name first.'); return; }
+  const code = genCode();
+  const confs = (await sget('mun:conferences')) || [];
+  confs.unshift({code, name, createdAt:Date.now()});
+  await sset('mun:conferences', confs);
+  await sset('mun:conf:'+code, { name, published:false, columns:['Motions','Resolution','Diplomacy','Overall'], delegates:[], chat:[] });
+  document.getElementById('mc-result').innerHTML = `<div class="result-strip"><b>PERMANENT CODE</b>${code} &mdash; this conference's code, forever. Click it below to build its marksheet.</div>`;
+  document.getElementById('mc-name').value='';
+  showToast('Conference created.');
+  render();
+}
+
+async function pageMunDetail(code){
+  const confs = (await sget('mun:conferences')) || [];
+  const meta = confs.find(c=>c.code===code);
+  let data = await sget('mun:conf:'+code);
+  if(!data){ data = {name: meta?meta.name:'Unknown', published:false, columns:['Motions','Resolution','Diplomacy','Overall'], delegates:[], chat:[]}; }
+  const admin = state.isAdmin;
+
+  const backLink = `<a class="back-link" onclick="go('mun')">&larr; All conferences</a>`;
+  const header = `
+    <div class="page-head">
+      <div class="eyebrow">MUN // ${code}</div>
+      <h2 class="section-title">${esc(data.name)}</h2>
+      <p class="section-sub">${data.published? 'Marksheet published — visible to everyone.' : 'Marksheet not yet published.'}</p>
+    </div>`;
+
+  if(admin){
+    return backLink + header + `<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; edit the marksheet and message delegates below</div>` + munAdminPanel(code, data);
+  } else {
+    if(data.published){
+      return backLink + header + `<div class="index-box">${munTableReadonly(data)}</div>`;
+    } else {
+      return backLink + header + `
+        <div class="index-box">
+          <div class="empty" style="margin-bottom:0;">This conference hasn't been published yet. Watch this space for updates from the dais.</div>
+        </div>
+        <div class="index-box" style="margin-top:20px;">
+          <div class="index-head"><span class="label">DAIS MESSAGES</span></div>
+          ${munChat(data, code, false)}
+        </div>`;
+    }
   }
 }
-setTimeout(type,320);
 
-// menu
-let open=false;
-function toggleMenu(){
-  open=!open;
-  document.getElementById('ham').classList.toggle('open',open);
-  document.getElementById('menu').classList.toggle('open',open);
-}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&open)toggleMenu()});
+function munAdminPanel(code, data){
+  const cols = data.columns;
+  const rows = data.delegates.map((d,i)=>`
+    <tr>
+      <td><input value="${esc(d.delegation)}" onchange="setDel('${code}',${i},'delegation',this.value)"></td>
+      <td>
+        <select onchange="setDel('${code}',${i},'rollCall',this.value)">
+          <option value="Present" ${d.rollCall==='Present'?'selected':''}>Present</option>
+          <option value="Present & Voting" ${d.rollCall==='Present & Voting'?'selected':''}>Present &amp; Voting</option>
+          <option value="Absent" ${d.rollCall==='Absent'?'selected':''}>Absent</option>
+        </select>
+      </td>
+      ${cols.map(c=>`<td><input value="${esc((d.values&&d.values[c])||'')}" onchange="setDelVal('${code}',${i},'${c.replace(/'/g,"\\'")}',this.value)"></td>`).join('')}
+      <td><button class="btn-sm outline" onclick="removeDel('${code}',${i})">&times;</button></td>
+    </tr>`).join('');
 
-// clock
-function tick(){
-  document.getElementById('clock').textContent=
-    'IST '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  return `
+  <div class="index-box" style="margin-bottom:20px;">
+    <div class="index-head"><span class="label">MARKSHEET</span><span class="tag">${data.published?'LIVE':'DRAFT'}</span></div>
+    <div style="overflow-x:auto; margin-bottom:18px;">
+    <table class="marks">
+      <thead><tr>
+        <th>Delegation</th><th>Roll Call</th>
+        ${cols.map(c=>`<th>${esc(c)} <span style="cursor:pointer;" onclick="removeCol('${code}','${c.replace(/'/g,"\\'")}')">&times;</span></th>`).join('')}
+        <th></th>
+      </tr></thead>
+      <tbody>${rows || `<tr><td colspan="${cols.length+3}" style="text-align:center; color:#8a8168;">No delegations added yet.</td></tr>`}</tbody>
+    </table>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn-sm orange" onclick="addDel('${code}')">+ Add delegation</button>
+      <button class="btn-sm outline" onclick="addCol('${code}')">+ Add column</button>
+      ${data.published?`<button class="btn-sm outline" disabled>Already published</button>`:`<button class="btn-sm" onclick="publishConf('${code}')">Publish marksheet</button>`}
+    </div>
+  </div>
+  <div class="index-box">
+    <div class="index-head"><span class="label">DELEGATE CHATBOX</span></div>
+    ${munChat(data, code, true)}
+  </div>`;
 }
-tick();setInterval(tick,1000);
 
-// snack
-function snack(msg){
-  const el=document.getElementById('snack');
-  el.textContent=msg;el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),2600);
+async function setDel(code, i, field, val){
+  const data = await sget('mun:conf:'+code);
+  data.delegates[i][field] = val;
+  await sset('mun:conf:'+code, data);
+}
+async function setDelVal(code, i, col, val){
+  const data = await sget('mun:conf:'+code);
+  data.delegates[i].values = data.delegates[i].values || {};
+  data.delegates[i].values[col] = val;
+  await sset('mun:conf:'+code, data);
+}
+async function addDel(code){
+  const v = await openFormModal({title:'Add delegation', fields:[{name:'name', label:'Delegation name', placeholder:'e.g. France, WHO'}], submitLabel:'Add'});
+  if(!v || !v.name) return;
+  const data = await sget('mun:conf:'+code);
+  data.delegates.push({delegation:v.name, rollCall:'Present', values:{}});
+  await sset('mun:conf:'+code, data);
+  render();
+}
+async function removeDel(code, i){
+  const ok = await openConfirmModal('Remove this delegation from the marksheet?', true);
+  if(!ok) return;
+  const data = await sget('mun:conf:'+code);
+  data.delegates.splice(i,1);
+  await sset('mun:conf:'+code, data);
+  render();
+}
+async function addCol(code){
+  const v = await openFormModal({title:'Add column', fields:[{name:'name', label:'Column name', placeholder:'e.g. Working Paper'}], submitLabel:'Add'});
+  if(!v || !v.name) return;
+  const data = await sget('mun:conf:'+code);
+  if(!data.columns.includes(v.name)) data.columns.push(v.name);
+  await sset('mun:conf:'+code, data);
+  render();
+}
+async function removeCol(code, col){
+  const ok = await openConfirmModal(`Remove the column "${col}" from every delegation?`, true);
+  if(!ok) return;
+  const data = await sget('mun:conf:'+code);
+  data.columns = data.columns.filter(c=>c!==col);
+  await sset('mun:conf:'+code, data);
+  render();
+}
+async function publishConf(code){
+  const saved = await sget('site:admin-passcode');
+  const v = await openFormModal({
+    title:'Publish marksheet',
+    desc:'Once published, the marksheet becomes visible to everyone and the dais chat is replaced by the results table. Confirm with your admin passcode.',
+    fields:[{name:'p', label:'Admin passcode', type:'password'}],
+    submitLabel:'Publish'
+  });
+  if(!v) return;
+  if(v.p !== saved){ showToast('Incorrect passcode. Not published.'); return; }
+  const data = await sget('mun:conf:'+code);
+  data.published = true;
+  await sset('mun:conf:'+code, data);
+  showToast('Marksheet published.');
+  render();
 }
 
-// cv download — place your cv.pdf in the same folder, rename below if needed
-function downloadCV(){
-  const a=document.createElement('a');
-  a.href='aarav_pandey_cv.pdf';          // ← put your CV file here as cv.pdf
-  a.download='Aarav_Pandey_CV.pdf';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+function munTableReadonly(data){
+  const cols = data.columns;
+  const rows = (data.delegates||[]).map(d=>{
+    const rcClass = d.rollCall==='Present'?'rc-present':(d.rollCall==='Absent'?'rc-absent':'rc-pv');
+    return `<tr><td>${esc(d.delegation)}</td><td class="${rcClass}">${esc(d.rollCall)}</td>${cols.map(c=>`<td>${esc((d.values&&d.values[c])||'')}</td>`).join('')}</tr>`;
+  }).join('');
+  return `<div class="index-head"><span class="label">RESULTS</span></div>
+  <div style="overflow-x:auto;">
+  <table class="marks">
+    <thead><tr><th>Delegation</th><th>Roll Call</th>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead>
+    <tbody>${rows || `<tr><td colspan="${cols.length+2}" style="text-align:center; color:#8a8168;">No delegations recorded.</td></tr>`}</tbody>
+  </table></div>`;
 }
 
-function soon(name){
-  if(open)toggleMenu();
-  snack(name+' — coming soon');
+function munChat(data, code, isAdmin){
+  const msgs = (data.chat||[]).map(m=>`<div class="msg"><div class="ts">${new Date(m.ts).toLocaleString()}</div>${esc(m.text)}</div>`).join('');
+  return `
+  <div class="chatbox">${msgs || '<div class="empty" style="padding:0;">No messages from the dais yet.</div>'}</div>
+  ${isAdmin?`<div class="chat-input-row">
+    <input id="chatIn-${code}" placeholder="Message all delegates..." onkeydown="if(event.key==='Enter') sendChat('${code}')">
+    <button class="btn-sm orange" onclick="sendChat('${code}')">Send</button>
+  </div>`:''}`;
 }
+async function sendChat(code){
+  const el = document.getElementById('chatIn-'+code);
+  const text = el.value.trim(); if(!text) return;
+  const data = await sget('mun:conf:'+code);
+  data.chat = data.chat || [];
+  data.chat.push({id:uid(), text, ts:Date.now()});
+  await sset('mun:conf:'+code, data);
+  el.value='';
+  render();
+}
+
+/* ---------------- INIT ---------------- */
+go('home');
 </script>
 </body>
 </html>
