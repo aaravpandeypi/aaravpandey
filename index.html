@@ -213,6 +213,11 @@
   .add-box:hover{background:var(--cream-2); color:var(--ink); transform:translateY(-2px);}
   .add-box:active{transform:translateY(0);}
 
+
+  .marks-tools{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 12px;font-family:'Press Start 2P',monospace;font-size:9px;text-transform:uppercase;color:#8a8168;}
+  table.marks .total-cell{font-family:'Press Start 2P',monospace;font-size:11px;background:var(--cream-2);font-weight:700;text-align:center;}
+  @media(max-width:700px){#countryMatrix{grid-template-columns:1fr 1fr !important;}}
+  @media(max-width:480px){#countryMatrix{grid-template-columns:1fr !important;}}
   /* MUN conference tiles */
   .conf-grid{display:flex; flex-direction:column; gap:14px;}
   .conf-tile{border:2px solid var(--ink); background:var(--cream); padding:18px 20px; box-shadow:4px 4px 0 var(--ink); cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:14px; transition:transform .15s ease, box-shadow .15s ease;}
@@ -840,7 +845,7 @@ async function pagePhotography(){
   return `
   <div class="page-head">
     <div class="eyebrow">PHOTOGRAPHY</div>
-    <h2 class="section-title">Frames from @theprofiletwo.</h2>
+    <h2 class="section-title">Frames from Project Flaperon.</h2>
     <p class="section-sub">A visual log &mdash; shot, developed, and filed by Aarav.</p>
   </div>
   ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; upload photos below</div>
@@ -1125,233 +1130,99 @@ async function moveReference(id, direction){
   render();
 }
 
+/* ---------------- MUN COUNTRY MATRIX ---------------- */
+const MUN_COUNTRIES = [
+'Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan',
+'Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi',
+'Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica','Cote d’Ivoire','Croatia','Cuba','Cyprus','Czechia',
+'Democratic Republic of the Congo','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia',
+'Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary',
+'Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg',
+'Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar',
+'Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe','Kosovo'
+];
+const munSaveQueues = new Map();
+function queueMunSave(code, mutator){
+  const prev = munSaveQueues.get(code) || Promise.resolve();
+  const next = prev.then(async()=>{ const data=await sget('mun:conf:'+code); mutator(data); await sset('mun:conf:'+code,data); });
+  munSaveQueues.set(code,next.catch(()=>{}));
+  return next;
+}
+function munScoreTotal(d, cols){
+  return cols.reduce((sum,c)=>{ const n=Number(d.values&&d.values[c]); return sum+(Number.isFinite(n)?n:0); },0);
+}
+function openCountryMatrix(selected=[]){
+  return new Promise(resolve=>{
+    const root=document.getElementById('modalRoot');
+    const set=new Set(selected);
+    root.innerHTML=`<div class="modal-overlay" id="countryOverlay"><div class="modal-box" style="max-width:900px;">
+      <h3>Select participating countries</h3><p class="mdesc">Choose the delegations actually attending. You can select all, clear all, or search the 196-country matrix.</p>
+      <input id="countrySearch" placeholder="Search countries..." oninput="filterCountryMatrix(this.value)">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px"><button class="btn-sm outline" type="button" onclick="toggleAllCountries(true)">Select all</button><button class="btn-sm outline" type="button" onclick="toggleAllCountries(false)">Clear all</button><span id="countryCount" class="tag" style="align-self:center"></span></div>
+      <div id="countryMatrix" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-height:50vh;overflow:auto;border:1px solid #c9c0ad;padding:12px;background:var(--cream-2);">
+      ${MUN_COUNTRIES.map((c,i)=>`<label class="country-option" data-country="${esc(c.toLowerCase())}" style="display:flex;gap:7px;align-items:center;padding:6px;border:1px solid #d5ccb9;background:var(--cream);font-size:12px"><input type="checkbox" class="country-check" value="${esc(c)}" ${set.has(c)?'checked':''} onchange="updateCountryCount()"><span>${i+1}. ${esc(c)}</span></label>`).join('')}</div>
+      <div class="modal-actions"><button class="modal-cancel" type="button" id="countryCancel">Cancel</button><button class="modal-submit" type="button" id="countrySave">Use selected countries</button></div>
+    </div></div>`;
+    requestAnimationFrame(()=>document.getElementById('countryOverlay').classList.add('show'));
+    const close=v=>{document.getElementById('countryOverlay').classList.remove('show');setTimeout(()=>{root.innerHTML='';resolve(v)},200)};
+    document.getElementById('countryCancel').onclick=()=>close(null);
+    document.getElementById('countrySave').onclick=()=>close([...document.querySelectorAll('.country-check:checked')].map(x=>x.value));
+    updateCountryCount();
+  });
+}
+function updateCountryCount(){ const n=document.querySelectorAll('.country-check:checked').length; const el=document.getElementById('countryCount'); if(el) el.textContent=n+' selected'; }
+function filterCountryMatrix(q){ q=q.toLowerCase(); document.querySelectorAll('.country-option').forEach(el=>el.style.display=el.dataset.country.includes(q)?'flex':'none'); }
+function toggleAllCountries(v){ document.querySelectorAll('.country-option').forEach(el=>{if(el.style.display!=='none') el.querySelector('.country-check').checked=v;}); updateCountryCount(); }
+
 /* ---------------- MUN ---------------- */
 async function pageMunList(){
-  const confs = (await sget('mun:conferences')) || [];
-  const admin = state.isAdmin;
-
-  let tiles = '';
+  const confs=(await sget('mun:conferences'))||[]; const admin=state.isAdmin;
+  let tiles='';
   if(confs.length){
-    const details = await Promise.all(confs.map(c=>sget('mun:conf:'+c.code)));
-    confs.forEach((c,i)=>{
-      const data = details[i];
-      const live = data && data.published;
-      tiles += `
-      <div class="conf-tile" onclick="go('mun-detail', {munCode:'${c.code}'})">
-        <div>
-          <h3>${esc(c.name)}</h3>
-          <div class="code">CODE // ${c.code}</div>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
-          <span class="status ${live?'live':'pending'}">${live?'PUBLISHED':'PENDING'}</span>
-          ${admin?`<button class="btn-sm outline" title="Delete conference" onclick="event.stopPropagation(); deleteConf('${c.code}')">&times;</button>`:''}
-        </div>
-      </div>`;
-    });
-  } else {
-    tiles = `<div class="empty">No conferences added yet.</div>`;
-  }
-
-  const indexBox = `
-    <div class="index-box">
-      <div class="index-head"><span class="label">CONFERENCE INDEX</span><span class="tag">MUN / RECORDS</span></div>
-      <div class="conf-grid">${tiles}</div>
-    </div>`;
-
-  const panel = admin ? `
-    <div class="panel-box">
-      <span class="label">ADMIN ENTRY</span>
-      <h3>New conference</h3>
-      <p class="desc">Creates a permanent access code for this conference. You'll build its marksheet next, and publish it when it's ready for delegates to see.</p>
-      <input id="mc-name" placeholder="Conference name, e.g. DHSMUN 2026">
-      <button class="btn-solid submit-wide" onclick="addConf()">Create conference</button>
-      <div id="mc-result"></div>
-    </div>` : '';
-
-  return `
-  <div class="page-head">
-    <div class="eyebrow">MODEL UNITED NATIONS</div>
-    <h2 class="section-title">Conference records.</h2>
-    <p class="section-sub">Pick a conference to view its marksheet, once it has been published.</p>
-  </div>
-  ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE</div>`:''}
-  <div class="index-grid">${indexBox}${panel}</div>`;
+    const details=await Promise.all(confs.map(c=>sget('mun:conf:'+c.code)));
+    confs.forEach((c,i)=>{const data=details[i];const live=data&&data.published;tiles+=`<div class="conf-tile" onclick="go('mun-detail',{munCode:'${c.code}'})"><div><h3>${esc(c.name)}</h3><div class="code">CODE // ${c.code}</div><div class="code">${esc(data?.committee||'Committee not set')} · ${data?.days||1} day${(data?.days||1)==1?'':'s'}</div></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span class="status ${live?'live':'pending'}">${live?'PUBLISHED':'PENDING'}</span>${admin?`<button class="btn-sm outline" title="Delete conference" onclick="event.stopPropagation();deleteConf('${c.code}')">&times;</button>`:''}</div></div>`});
+  } else tiles='<div class="empty">No conferences added yet.</div>';
+  const indexBox=`<div class="index-box"><div class="index-head"><span class="label">CONFERENCE INDEX</span><span class="tag">MUN / RECORDS</span></div><div class="conf-grid">${tiles}</div></div>`;
+  const panel=admin?`<div class="panel-box"><span class="label">ADMIN ENTRY</span><h3>New conference</h3><p class="desc">Set the committee, number of conference days, and participating countries first. The marksheet is then created as a persistent draft.</p><input id="mc-name" placeholder="Conference name, e.g. DHSMUN 2026"><input id="mc-committee" placeholder="Committee, e.g. United Nations Security Council"><input id="mc-days" type="number" min="1" max="7" value="2" placeholder="Number of days"><button class="btn-solid submit-wide" onclick="addConf()">Create conference & select countries</button><div id="mc-result"></div></div>`:'';
+  return `<div class="page-head"><div class="eyebrow">MODEL UNITED NATIONS</div><h2 class="section-title">Conference records.</h2><p class="section-sub">Pick a conference to view its marksheet, once it has been published.</p></div>${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE</div>`:''}<div class="index-grid">${indexBox}${panel}</div>`;
 }
-async function deleteConf(code){
-  const ok = await openConfirmModal('This conference, its marksheet, and its delegate chat will be permanently removed.', true);
-  if(!ok) return;
-  let confs = (await sget('mun:conferences')) || [];
-  confs = confs.filter(c=>c.code!==code);
-  await sset('mun:conferences', confs);
-  try{ await window.firebaseReady; await window.fbDeleteDoc(window.fbDoc(window.fbDb, 'portfolio', 'mun:conf:'+code)); }catch(e){}
-  dataCache.delete('mun:conf:'+code);
-  try{ localStorage.removeItem(CACHE_PREFIX+'mun:conf:'+code); }catch(e){}
-  if(state.munCode===code) state.munCode=null;
-  showToast('Conference deleted.');
-  render();
-}
-
+async function deleteConf(code){const ok=await openConfirmModal('This conference, its marksheet, and its delegate chat will be permanently removed.',true);if(!ok)return;let confs=(await sget('mun:conferences'))||[];confs=confs.filter(c=>c.code!==code);await sset('mun:conferences',confs);try{await window.firebaseReady;await window.fbDeleteDoc(window.fbDoc(window.fbDb,'portfolio','mun:conf:'+code));}catch(e){} dataCache.delete('mun:conf:'+code);try{localStorage.removeItem(CACHE_PREFIX+'mun:conf:'+code)}catch(e){} if(state.munCode===code)state.munCode=null;showToast('Conference deleted.');render();}
 async function addConf(){
-  const name = document.getElementById('mc-name').value.trim();
-  if(!name){ showToast('Give the conference a name first.'); return; }
-  const code = genCode();
-  const confs = (await sget('mun:conferences')) || [];
-  confs.unshift({code, name, createdAt:Date.now()});
-  await sset('mun:conferences', confs);
-  await sset('mun:conf:'+code, { name, published:false, columns:['Motions','Resolution','Diplomacy','Overall'], delegates:[], chat:[] });
-  document.getElementById('mc-result').innerHTML = `<div class="result-strip"><b>PERMANENT CODE</b>${code} &mdash; this conference's code, forever. Click it below to build its marksheet.</div>`;
-  document.getElementById('mc-name').value='';
-  showToast('Conference created.');
-  render();
+  const name=document.getElementById('mc-name').value.trim(), committee=document.getElementById('mc-committee').value.trim(); const days=Math.max(1,Math.min(7,Number(document.getElementById('mc-days').value)||1));
+  if(!name||!committee){showToast('Add the conference name and committee first.');return;}
+  const selected=await openCountryMatrix([]); if(!selected||!selected.length){showToast('Select at least one participating country.');return;}
+  const code=genCode(), confs=(await sget('mun:conferences'))||[]; confs.unshift({code,name,committee,days,createdAt:Date.now()}); await sset('mun:conferences',confs);
+  const delegates=selected.map(country=>({delegation:country,rollCalls:Array(days).fill('Present'),values:{}}));
+  await sset('mun:conf:'+code,{name,committee,days,published:false,columns:['Motions','Resolution','Diplomacy','Overall'],delegates,chat:[],draft:true});
+  document.getElementById('mc-result').innerHTML=`<div class="result-strip"><b>PERMANENT CODE</b>${code} — ${days} day${days===1?'':'s'} · ${esc(committee)} · ${selected.length} countries. Draft is saved immediately.</div>`;document.getElementById('mc-name').value='';document.getElementById('mc-committee').value='';showToast('Conference created and draft saved.');render();
 }
-
 async function pageMunDetail(code){
-  const confs = (await sget('mun:conferences')) || [];
-  const meta = confs.find(c=>c.code===code);
-  let data = await sget('mun:conf:'+code);
-  if(!data){ data = {name: meta?meta.name:'Unknown', published:false, columns:['Motions','Resolution','Diplomacy','Overall'], delegates:[], chat:[]}; }
-  const admin = state.isAdmin;
-
-  const backLink = `<a class="back-link" onclick="go('mun')">&larr; All conferences</a>`;
-  const header = `
-    <div class="page-head">
-      <div class="eyebrow">MUN // ${code}</div>
-      <h2 class="section-title">${esc(data.name)}</h2>
-      <p class="section-sub">${data.published? 'Marksheet published — visible to everyone.' : 'Marksheet not yet published.'}</p>
-    </div>`;
-
-  if(admin){
-    return backLink + header + `<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; edit the marksheet and message delegates below</div>` + munAdminPanel(code, data);
-  } else {
-    if(data.published){
-      return backLink + header + `<div class="index-box">${munTableReadonly(data)}</div>`;
-    } else {
-      return backLink + header + `
-        <div class="index-box">
-          <div class="empty" style="margin-bottom:0;">This conference hasn't been published yet. Watch this space for updates from the dais.</div>
-        </div>
-        <div class="index-box" style="margin-top:20px;">
-          <div class="index-head"><span class="label">DAIS MESSAGES</span></div>
-          ${munChat(data, code, false)}
-        </div>`;
-    }
-  }
+  const confs=(await sget('mun:conferences'))||[],meta=confs.find(c=>c.code===code); let data=await sget('mun:conf:'+code); if(!data)data={name:meta?meta.name:'Unknown',committee:meta?.committee||'',days:meta?.days||1,published:false,columns:['Motions','Resolution','Diplomacy','Overall'],delegates:[],chat:[],draft:true}; data.days=Math.max(1,Number(data.days)||1); data.delegates=(data.delegates||[]).map(d=>({...d,rollCalls:Array.from({length:data.days},(_,i)=>(d.rollCalls&&d.rollCalls[i])||d.rollCall||'Present')}));
+  const admin=state.isAdmin,back=`<a class="back-link" onclick="go('mun')">&larr; All conferences</a>`,header=`<div class="page-head"><div class="eyebrow">MUN // ${code}</div><h2 class="section-title">${esc(data.name)}</h2><p class="section-sub"><b>${esc(data.committee||'Committee not set')}</b> · ${data.days} day${data.days===1?'':'s'} · ${data.published?'Marksheet published — visible to everyone.':'Marksheet is a private draft — changes are saved automatically.'}</p></div>`;
+  if(admin)return back+header+`<div class="admin-bar"><span class="adot"></span>ADMIN MODE — DRAFT AUTOSAVES · publish only when the conference is complete</div>`+munAdminPanel(code,data);
+  return back+header+(data.published?`<div class="index-box">${munTableReadonly(data)}</div>`:`<div class="index-box"><div class="empty" style="margin-bottom:0;">This conference hasn't been published yet. Watch this space for updates from the dais.</div></div><div class="index-box" style="margin-top:20px"><div class="index-head"><span class="label">DAIS MESSAGES</span></div>${munChat(data,code,false)}</div>`);
 }
-
-function munAdminPanel(code, data){
-  const cols = data.columns;
-  const rows = data.delegates.map((d,i)=>`
-    <tr>
-      <td><input value="${esc(d.delegation)}" onchange="setDel('${code}',${i},'delegation',this.value)"></td>
-      <td>
-        <select onchange="setDel('${code}',${i},'rollCall',this.value)">
-          <option value="Present" ${d.rollCall==='Present'?'selected':''}>Present</option>
-          <option value="Present & Voting" ${d.rollCall==='Present & Voting'?'selected':''}>Present &amp; Voting</option>
-          <option value="Absent" ${d.rollCall==='Absent'?'selected':''}>Absent</option>
-        </select>
-      </td>
-      ${cols.map(c=>`<td><input value="${esc((d.values&&d.values[c])||'')}" onchange="setDelVal('${code}',${i},'${c.replace(/'/g,"\\'")}',this.value)"></td>`).join('')}
-      <td><button class="btn-sm outline" onclick="removeDel('${code}',${i})">&times;</button></td>
-    </tr>`).join('');
-
-  return `
-  <div class="index-box" style="margin-bottom:20px;">
-    <div class="index-head"><span class="label">MARKSHEET</span><span class="tag">${data.published?'LIVE':'DRAFT'}</span></div>
-    <div style="overflow-x:auto; margin-bottom:18px;">
-    <table class="marks">
-      <thead><tr>
-        <th>Delegation</th><th>Roll Call</th>
-        ${cols.map(c=>`<th>${esc(c)} <span style="cursor:pointer;" onclick="removeCol('${code}','${c.replace(/'/g,"\\'")}')">&times;</span></th>`).join('')}
-        <th></th>
-      </tr></thead>
-      <tbody>${rows || `<tr><td colspan="${cols.length+3}" style="text-align:center; color:#8a8168;">No delegations added yet.</td></tr>`}</tbody>
-    </table>
-    </div>
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      <button class="btn-sm orange" onclick="addDel('${code}')">+ Add delegation</button>
-      <button class="btn-sm outline" onclick="addCol('${code}')">+ Add column</button>
-      ${data.published?`<button class="btn-sm outline" disabled>Already published</button>`:`<button class="btn-sm" onclick="publishConf('${code}')">Publish marksheet</button>`}
-    </div>
-  </div>
-  <div class="index-box">
-    <div class="index-head"><span class="label">DELEGATE CHATBOX</span></div>
-    ${munChat(data, code, true)}
-  </div>`;
+function munAdminPanel(code,data){
+  const cols=data.columns||[]; const rows=(data.delegates||[]).map((d,i)=>`<tr><td><input value="${esc(d.delegation)}" oninput="setDel('${code}',${i},'delegation',this.value)"></td>${Array.from({length:data.days},(_,day)=>`<td><select onchange="setRollCall('${code}',${i},${day},this.value)"><option value="Present" ${(d.rollCalls?.[day]||'Present')==='Present'?'selected':''}>Present</option><option value="Present & Voting" ${(d.rollCalls?.[day])==='Present & Voting'?'selected':''}>Present &amp; Voting</option><option value="Absent" ${(d.rollCalls?.[day])==='Absent'?'selected':''}>Absent</option></select></td>`).join('')}${cols.map(c=>`<td><input type="number" value="${esc((d.values&&d.values[c])??'')}" oninput="setDelVal('${code}',${i},'${c.replace(/'/g,"\\'")}',this.value)"></td>`).join('')}<td class="total-cell">${munScoreTotal(d,cols)}</td><td><button class="btn-sm outline" onclick="removeDel('${code}',${i})">&times;</button></td></tr>`).join('');
+  return `<div class="index-box" style="margin-bottom:20px"><div class="index-head"><span class="label">MARKSHEET</span><span class="tag">${data.published?'LIVE':'DRAFT · AUTOSAVED'}</span></div><div class="marks-tools"><span>${esc(data.committee||'')}</span><span>${data.days} day${data.days===1?'':'s'} · ${data.delegates.length} delegations</span></div><div style="overflow-x:auto;margin-bottom:18px"><table class="marks"><thead><tr><th>Delegation</th>${Array.from({length:data.days},(_,i)=>`<th>Roll Call · Day ${i+1}</th>`).join('')}${cols.map(c=>`<th>${esc(c)} <span style="cursor:pointer" onclick="removeCol('${code}','${c.replace(/'/g,"\\'")}')">&times;</span></th>`).join('')}<th>TOTAL</th><th></th></tr></thead><tbody>${rows||`<tr><td colspan="${data.days+cols.length+3}" style="text-align:center;color:#8a8168">No delegations recorded.</td></tr>`}</tbody></table></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-sm orange" onclick="openAddCountryToConf('${code}')">+ Add delegation</button><button class="btn-sm outline" onclick="addCol('${code}')">+ Add marks column</button><button class="btn-sm outline" onclick="downloadMunExcel('${code}')">Download Excel</button>${data.published?`<button class="btn-sm outline" disabled>Already published</button>`:`<button class="btn-sm" onclick="publishConf('${code}')">Publish marksheet</button>`}</div></div><div class="index-box"><div class="index-head"><span class="label">DELEGATE CHATBOX</span></div>${munChat(data,code,true)}</div>`;
 }
-
-async function setDel(code, i, field, val){
-  const data = await sget('mun:conf:'+code);
-  data.delegates[i][field] = val;
-  await sset('mun:conf:'+code, data);
+async function openAddCountryToConf(code){const data=await sget('mun:conf:'+code);const selected=(data.delegates||[]).map(d=>d.delegation);const all=MUN_COUNTRIES.filter(c=>!selected.includes(c));const pick=await openCountryMatrix([]);if(!pick||!pick.length)return;const additions=pick.filter(c=>all.includes(c));data.delegates.push(...additions.map(c=>({delegation:c,rollCalls:Array(data.days).fill('Present'),values:{}})));await sset('mun:conf:'+code,data);showToast(additions.length+' delegation(s) added.');render();}
+async function setDel(code,i,field,val){await queueMunSave(code,data=>{data.delegates[i][field]=val;});}
+async function setDelVal(code,i,col,val){await queueMunSave(code,data=>{data.delegates[i].values=data.delegates[i].values||{};data.delegates[i].values[col]=val;});}
+async function setRollCall(code,i,day,val){await queueMunSave(code,data=>{data.delegates[i].rollCalls=data.delegates[i].rollCalls||Array(data.days).fill('Present');data.delegates[i].rollCalls[day]=val;});}
+async function addDel(code){const v=await openFormModal({title:'Add delegation',fields:[{name:'name',label:'Delegation name',placeholder:'e.g. France'}],submitLabel:'Add'});if(!v||!v.name)return;const data=await sget('mun:conf:'+code);data.delegates.push({delegation:v.name,rollCalls:Array(data.days).fill('Present'),values:{}});await sset('mun:conf:'+code,data);render();}
+async function removeDel(code,i){const ok=await openConfirmModal('Remove this delegation from the marksheet?',true);if(!ok)return;const data=await sget('mun:conf:'+code);data.delegates.splice(i,1);await sset('mun:conf:'+code,data);render();}
+async function addCol(code){const v=await openFormModal({title:'Add marks column',fields:[{name:'name',label:'Column name',placeholder:'e.g. Working Paper'}],submitLabel:'Add'});if(!v||!v.name)return;const data=await sget('mun:conf:'+code);if(!data.columns.includes(v.name))data.columns.push(v.name);await sset('mun:conf:'+code,data);render();}
+async function removeCol(code,col){const ok=await openConfirmModal(`Remove the column "${col}" from every delegation?`,true);if(!ok)return;const data=await sget('mun:conf:'+code);data.columns=data.columns.filter(c=>c!==col);await sset('mun:conf:'+code,data);render();}
+async function publishConf(code){const saved=await sget('site:admin-passcode');const v=await openFormModal({title:'Publish marksheet',desc:'Publishing makes the current draft visible to everyone. Your draft remains saved until then.',fields:[{name:'p',label:'Admin passcode',type:'password'}],submitLabel:'Publish'});if(!v)return;if(v.p!==saved){showToast('Incorrect passcode. Not published.');return}const data=await sget('mun:conf:'+code);data.published=true;data.draft=false;await sset('mun:conf:'+code,data);showToast('Marksheet published.');render();}
+async function downloadMunExcel(code){
+  const data=await sget('mun:conf:'+code); if(!data)return;
+  if(!window.XLSX){await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc);}).catch(()=>null);}
+  const headers=['Delegation',...Array.from({length:data.days},(_,i)=>`Roll Call · Day ${i+1}`),...(data.columns||[]),'TOTAL'];
+  const body=(data.delegates||[]).map(d=>[d.delegation,...Array.from({length:data.days},(_,i)=>(d.rollCalls?.[i]||'Present')),...(data.columns||[]).map(c=>d.values?.[c]??''),munScoreTotal(d,data.columns||[])]);
+  if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([['MUN MARKSHEET'],[data.name],['Committee',data.committee],['Conference days',data.days],[],headers,...body]);ws['!cols']=headers.map(h=>({wch:Math.max(14,String(h).length+2)}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Marksheet');XLSX.writeFile(wb,`${data.name.replace(/[^a-z0-9]+/gi,'_')}_Marksheet.xlsx`);showToast('Excel file downloaded.');}else{const csv=[headers,...body].map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`${data.name}_Marksheet.csv`;a.click();showToast('Excel-compatible CSV downloaded.');}
 }
-async function setDelVal(code, i, col, val){
-  const data = await sget('mun:conf:'+code);
-  data.delegates[i].values = data.delegates[i].values || {};
-  data.delegates[i].values[col] = val;
-  await sset('mun:conf:'+code, data);
-}
-async function addDel(code){
-  const v = await openFormModal({title:'Add delegation', fields:[{name:'name', label:'Delegation name', placeholder:'e.g. France, WHO'}], submitLabel:'Add'});
-  if(!v || !v.name) return;
-  const data = await sget('mun:conf:'+code);
-  data.delegates.push({delegation:v.name, rollCall:'Present', values:{}});
-  await sset('mun:conf:'+code, data);
-  render();
-}
-async function removeDel(code, i){
-  const ok = await openConfirmModal('Remove this delegation from the marksheet?', true);
-  if(!ok) return;
-  const data = await sget('mun:conf:'+code);
-  data.delegates.splice(i,1);
-  await sset('mun:conf:'+code, data);
-  render();
-}
-async function addCol(code){
-  const v = await openFormModal({title:'Add column', fields:[{name:'name', label:'Column name', placeholder:'e.g. Working Paper'}], submitLabel:'Add'});
-  if(!v || !v.name) return;
-  const data = await sget('mun:conf:'+code);
-  if(!data.columns.includes(v.name)) data.columns.push(v.name);
-  await sset('mun:conf:'+code, data);
-  render();
-}
-async function removeCol(code, col){
-  const ok = await openConfirmModal(`Remove the column "${col}" from every delegation?`, true);
-  if(!ok) return;
-  const data = await sget('mun:conf:'+code);
-  data.columns = data.columns.filter(c=>c!==col);
-  await sset('mun:conf:'+code, data);
-  render();
-}
-async function publishConf(code){
-  const saved = await sget('site:admin-passcode');
-  const v = await openFormModal({
-    title:'Publish marksheet',
-    desc:'Once published, the marksheet becomes visible to everyone and the dais chat is replaced by the results table. Confirm with your admin passcode.',
-    fields:[{name:'p', label:'Admin passcode', type:'password'}],
-    submitLabel:'Publish'
-  });
-  if(!v) return;
-  if(v.p !== saved){ showToast('Incorrect passcode. Not published.'); return; }
-  const data = await sget('mun:conf:'+code);
-  data.published = true;
-  await sset('mun:conf:'+code, data);
-  showToast('Marksheet published.');
-  render();
-}
-
-function munTableReadonly(data){
-  const cols = data.columns;
-  const rows = (data.delegates||[]).map(d=>{
-    const rcClass = d.rollCall==='Present'?'rc-present':(d.rollCall==='Absent'?'rc-absent':'rc-pv');
-    return `<tr><td>${esc(d.delegation)}</td><td class="${rcClass}">${esc(d.rollCall)}</td>${cols.map(c=>`<td>${esc((d.values&&d.values[c])||'')}</td>`).join('')}</tr>`;
-  }).join('');
-  return `<div class="index-head"><span class="label">RESULTS</span></div>
-  <div style="overflow-x:auto;">
-  <table class="marks">
-    <thead><tr><th>Delegation</th><th>Roll Call</th>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead>
-    <tbody>${rows || `<tr><td colspan="${cols.length+2}" style="text-align:center; color:#8a8168;">No delegations recorded.</td></tr>`}</tbody>
-  </table></div>`;
-}
+function munTableReadonly(data){const cols=data.columns||[];const rows=(data.delegates||[]).map(d=>`<tr><td>${esc(d.delegation)}</td>${Array.from({length:data.days},(_,i)=>{const r=d.rollCalls?.[i]||'Present';return `<td class="${r==='Present'?'rc-present':r==='Absent'?'rc-absent':'rc-pv'}">${esc(r)}</td>`}).join('')}${cols.map(c=>`<td>${esc((d.values&&d.values[c])??'')}</td>`).join('')}<td class="total-cell">${munScoreTotal(d,cols)}</td></tr>`).join('');return `<div class="index-head"><span class="label">RESULTS</span><span class="tag">${esc(data.committee||'')}</span></div><div style="overflow-x:auto"><table class="marks"><thead><tr><th>Delegation</th>${Array.from({length:data.days},(_,i)=>`<th>Roll Call · Day ${i+1}</th>`).join('')}${cols.map(c=>`<th>${esc(c)}</th>`).join('')}<th>TOTAL</th></tr></thead><tbody>${rows||`<tr><td colspan="${data.days+cols.length+2}" style="text-align:center;color:#8a8168">No delegations recorded.</td></tr>`}</tbody></table></div>`}
 
 function munChat(data, code, isAdmin){
   const msgs = (data.chat||[]).map(m=>`<div class="msg"><div class="ts">${new Date(m.ts).toLocaleString()}</div>${esc(m.text)}</div>`).join('');
@@ -1402,11 +1273,18 @@ Object.assign(window, {
   deleteConf,
   setDel,
   setDelVal,
+  setRollCall,
   addDel,
   removeDel,
   addCol,
   removeCol,
   publishConf,
+  downloadMunExcel,
+  openCountryMatrix,
+  filterCountryMatrix,
+  toggleAllCountries,
+  updateCountryCount,
+  openAddCountryToConf,
   sendChat,
   addReference,
   editReference,
