@@ -192,6 +192,14 @@
   @media(max-width:900px){.masonry{column-count:2;}}
   @media(max-width:560px){.masonry{column-count:1;}}
 
+  /* REORDER / REFERENCES */
+  .reorder-actions{display:flex; gap:6px; flex-wrap:wrap; align-items:center;}
+  .reorder-actions .btn-sm{min-width:34px; padding:7px 9px; text-align:center;}
+  .reference-block{position:relative; overflow:hidden;}
+  .reference-mark{position:absolute; top:-18px; right:18px; font-family:'Press Start 2P',monospace; font-size:52px; line-height:1; color:var(--orange); opacity:.16; pointer-events:none;}
+  .reference-meta{font-size:12px; color:var(--muted); margin:-4px 0 14px;}
+  .reference-empty{border:2px dashed var(--ink); padding:34px 24px; background:var(--cream-2); text-align:center;}
+
   /* PROJECTS / EXPERIENCE sections */
   .block{border:2px solid var(--ink); background:var(--cream-2); padding:28px; margin-bottom:26px; box-shadow:5px 5px 0 var(--ink); animation:fadeUp .4s ease both; transition:transform .15s ease, box-shadow .15s ease;}
   .block h3{font-size:17px; margin:0 0 14px; font-family:var(--body-font); font-weight:bold; border-bottom:2px solid var(--orange); display:inline-block; padding-bottom:6px;}
@@ -232,18 +240,18 @@
 
   .empty{color:var(--muted); font-size:14px; padding:24px 0; font-style:italic;}
   footer{background:var(--ink); color:var(--cream); padding:64px 0 30px; margin-top:70px;}
-  footer .footer-grid{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:34px; padding-bottom:34px;}
+  footer .footer-grid{display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:48px; padding-bottom:34px;}
   footer .footer-eyebrow{font-size:11px; letter-spacing:1px; color:#cbbfa4; margin-bottom:18px; font-family:var(--body-font);}
   footer h2.footer-heading{font-size:34px; color:var(--cream); margin:0; line-height:1.4;}
   footer h2.footer-heading .accent{color:var(--orange);}
-  footer .footer-meta{text-align:right; font-size:12px; color:#cbbfa4; line-height:2;}
-  footer .footer-bottom{border-top:1px solid #3a3426; padding:20px 0 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; font-size:12px; color:#8a8168;}
-  footer .footer-nav-links{display:flex; gap:18px; flex-wrap:wrap;}
+  footer .footer-meta{text-align:right; font-size:12px; color:#cbbfa4; line-height:2; white-space:nowrap;}
+  footer .footer-bottom{border-top:1px solid #3a3426; padding:20px 32px 0; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; column-gap:24px; font-size:12px; color:#8a8168;}
+  footer .footer-nav-links{display:flex; gap:18px; flex-wrap:wrap; align-items:center; min-width:0;}
   footer .footer-nav-links a{cursor:pointer; color:#cbbfa4; text-decoration:none; transition:color .15s ease;}
   footer .footer-nav-links a:hover{color:var(--orange);}
-  footer .admin-link{cursor:pointer; text-decoration:underline; color:#cbbfa4;}
+  footer .admin-link{cursor:pointer; text-decoration:underline; color:#cbbfa4; justify-self:end; white-space:nowrap;}
   footer .admin-link:hover{color:var(--orange);}
-  @media(max-width:700px){ footer .footer-grid{align-items:flex-start;} footer .footer-meta{text-align:left;} footer h2.footer-heading{font-size:26px;} }
+  @media(max-width:700px){ footer .footer-grid{grid-template-columns:1fr; align-items:flex-start;} footer .footer-meta{text-align:left; white-space:normal;} footer h2.footer-heading{font-size:26px;} footer .footer-bottom{grid-template-columns:1fr; justify-items:center; text-align:center;} footer .footer-nav-links{justify-content:center; width:100%;} footer .admin-link{justify-self:center;} }
   .back-link{display:inline-block; margin-bottom:24px; font-size:13px; font-weight:bold; text-decoration:none; border-bottom:2px solid var(--orange);}
 
   /* MODALS (replace prompt/confirm/alert, which the sandboxed preview blocks) */
@@ -269,27 +277,42 @@
   .file-picked{font-size:12px; color:var(--muted); margin-top:-8px; margin-bottom:14px;}
 
   @media(max-width:900px){
-    .hero{grid-template-columns:1fr;}
+    .hero{grid-template-columns:1fr; gap:34px;}
     nav.links{display:none;}
     .mobile-toggle{display:block;}
-    h1.display{font-size:36px;}
-    .masonry{column-count:2;}
+    h1.display{font-size:42px; line-height:1.42;}
+    .lede{font-size:17px; line-height:1.72;}
+    .console{min-height:420px;}
   }
   @media(max-width:900px){
     nav.links.open{display:flex; flex-direction:column; position:absolute; top:74px; left:0; right:0; background:var(--cream); border-bottom:3px solid var(--ink); padding:20px 32px; gap:16px;}
   }
   @media(max-width:640px){
-    .wrap{padding:0 20px;}
-    .navbar{padding:16px 20px;}
-    nav.links.open{padding:20px;}
-    h1.display{font-size:28px;}
-    .lede{font-size:16px;}
-    .console{padding:20px 20px 24px;}
-    .console-tags{font-size:12px;}
+    .wrap{padding:0 16px;}
+    .navbar{padding:15px 16px;}
+    nav.links.open{padding:18px 16px;}
+    #app{padding-top:74px; padding-bottom:54px;}
+    h1.display{font-size:34px; line-height:1.48; letter-spacing:0;}
+    .lede{font-size:17px; line-height:1.78;}
+    .hero > div:first-child{padding:0 2px;}
+    .cta-row{gap:14px;}
+    .console{padding:20px 18px 22px; min-height:380px;}
+    .console-tags{font-size:12px; line-height:2.05;}
     .index-box, .panel-box, .block{padding:18px;}
     .research-row{padding:16px;}
     table.marks th, table.marks td{padding:8px;}
     .footer-heading{font-size:24px;}
+    footer{padding-top:48px;}
+    footer .footer-meta{text-align:center; width:100%;}
+    footer .admin-link{justify-self:center;}
+    .masonry{grid-template-columns:repeat(2,minmax(0,1fr)); gap:3px; padding:3px; border-radius:24px 5px 24px 5px; box-shadow:6px 6px 0 var(--ink);}
+    .masonry .ph.wide{grid-column:span 2;}
+    .gallery-note{font-size:9px; flex-direction:column; align-items:flex-start; gap:6px;}
+  }
+  @media(max-width:390px){
+    h1.display{font-size:32px;}
+    .lede{font-size:16.5px;}
+    .brand span{font-size:11px;}
   }
 </style>
 </head>
@@ -307,6 +330,8 @@
       <a onclick="go('photography')" data-p="photography">Photography</a>
       <a onclick="go('projects')" data-p="projects">Projects</a>
       <a onclick="go('experience')" data-p="experience">Experience</a>
+      <a onclick="go('references')" data-p="references">References</a>
+      <span id="customNavLinks"></span>
     </nav>
     <button class="mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
   </div>
@@ -341,6 +366,8 @@
       <a onclick="go('photography')">Photography</a>
       <a onclick="go('projects')">Projects</a>
       <a onclick="go('experience')">Experience</a>
+      <a onclick="go('references')">References</a>
+      <span id="customFooterLinks"></span>
     </div>
     <span class="admin-link" onclick="toggleAdmin()" id="adminToggleLabel">Admin</span>
   </div>
@@ -408,6 +435,7 @@ function go(page, extra){
   if(extra) Object.assign(state, extra);
   document.getElementById('navLinks').classList.remove('open');
   document.querySelectorAll('nav.links a').forEach(a=>a.classList.toggle('active', a.dataset.p===page));
+  if(state.page==='custom') document.querySelectorAll('nav.links a[data-custom-id]').forEach(a=>a.classList.toggle('active', a.dataset.customId===state.customPageId));
   render();
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -571,6 +599,7 @@ async function toggleAdmin(){
     state.isAdmin = false;
     document.getElementById('adminToggleLabel').textContent = 'Admin';
     render();
+    refreshCustomNavigation().catch(()=>{});
     return;
   }
   const saved = await sget('site:admin-passcode');
@@ -593,6 +622,10 @@ async function toggleAdmin(){
   }
   document.getElementById('adminToggleLabel').textContent = 'Admin: ON';
   render();
+  // Refresh dynamic page navigation and populate the admin page index after admin mode appears.
+  refreshCustomNavigation().then(()=>{
+    renderCustomPageAdminList();
+  }).catch(()=>{});
 }
 
 /* ---------------- RENDER ROUTER ---------------- */
@@ -609,10 +642,13 @@ async function render(){
   else if(state.page==='photography') html = await pagePhotography();
   else if(state.page==='projects') html = await pageProjects();
   else if(state.page==='experience') html = await pageExperience();
+  else if(state.page==='references') html = await pageReferences();
+  else if(state.page==='custom') html = await pageCustomPage(state.customPageId);
   if(myToken !== renderToken) return; // a newer render started; drop this one
   app.innerHTML = html;
   void app.offsetWidth;
   app.classList.remove('page-out');
+  if(state.isAdmin) requestAnimationFrame(()=>renderCustomPageAdminList());
 }
 
 /* ---------------- HOME ---------------- */
@@ -660,8 +696,49 @@ function pageHome(){
       <h3>Frames from<br>the in-between.</h3>
       <span class="arrow">&#8599;</span>
     </div>
-  </section>`;
+  </section>
+  ${state.isAdmin ? adminCustomPagesPanel() : ''}`;
 }
+
+/* ---------------- CUSTOM PAGES ---------------- */
+function adminCustomPagesPanel(){
+  return `<section class="custom-admin" style="margin-top:64px;"><div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; MANAGE PAGES</div><div class="index-grid"><div class="index-box"><div class="index-head"><span class="label">PAGE INDEX</span><span class="tag">SITE / PAGES</span></div><div id="customPageAdminList"><div class="empty">Loading pages...</div></div></div><div class="panel-box"><span class="label">PAGE BUILDER</span><h3>Add a new page</h3><p class="desc">Choose the structure first. You can then build the page without touching the rest of the site.</p><button class="btn-solid submit-wide" onclick="addCustomPage()">+ Add a page</button></div></div></section>`;
+}
+async function renderCustomPageAdminList(){
+  const el=document.getElementById('customPageAdminList'); if(!el)return;
+  const list=(await sget('site:pages'))||[];
+  if(!list.length){el.innerHTML='<div class="empty">No extra pages yet. Use <b>+ Add a page</b> to create your first one.</div>';return;}
+  el.innerHTML=list.map((pg,i)=>{const t={sections:'SECTIONS',gallery:'GALLERY',references:'REFERENCES / LIST',records:'RECORDS'}[pg.type]||'PAGE';return `<div class="research-row" style="align-items:center;"><div><h3>${esc(pg.navTitle||pg.title)}</h3><div class="meta">${t} &middot; /${esc(pg.slug)}</div></div><div class="research-actions"><button class="btn-sm outline" onclick="go('custom',{customPageId:'${pg.id}'})">Open</button><button class="btn-sm outline" onclick="editCustomPage('${pg.id}')">Edit</button><button class="btn-sm outline" onclick="moveCustomPage('${pg.id}',-1)" ${i===0?'disabled':''}>&uarr;</button><button class="btn-sm outline" onclick="moveCustomPage('${pg.id}',1)" ${i===list.length-1?'disabled':''}>&darr;</button><button class="btn-sm outline" onclick="deleteCustomPage('${pg.id}')" title="Delete page">&times;</button></div></div>`;}).join('');
+}
+function pageTypeDescription(type){return ({sections:'A clean editorial page made of text, optional images and links — like Projects or Experience.',gallery:'A visual page where every entry is an image with an optional caption.',references:'An archive page for LORs, testimonials, awards, certificates, publications, or similar entries.',records:'A structured index for conferences, events, achievements, or other repeatable records.'})[type]||'';}
+async function addCustomPage(){
+  const pick=await openFormModal({title:'Choose a page type',desc:'Choose the structure that best fits what you want this page to contain.',fields:[{name:'type',label:'Page type',type:'select',options:['sections','gallery','references','records'],value:'sections'}],submitLabel:'Choose type'}); if(!pick)return;
+  const v=await openFormModal({title:'Set up your page',desc:pageTypeDescription(pick.type),fields:[{name:'navTitle',label:'Navigation name',placeholder:'e.g. Awards'},{name:'eyebrow',label:'Eyebrow',placeholder:'e.g. AWARDS / RECORDS'},{name:'title',label:'Page title',placeholder:'e.g. Things worth keeping'},{name:'subtitle',label:'Intro / description',type:'textarea'},{name:'slug',label:'URL slug',placeholder:'e.g. awards'}],submitLabel:'Create page'}); if(!v||!v.navTitle||!v.title)return;
+  const list=(await sget('site:pages'))||[]; let slug=(v.slug||v.navTitle).toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); if(!slug)slug='page-'+uid(); if(list.some(x=>x.slug===slug)){showToast('That URL slug is already in use.');return;}
+  list.push({id:uid(),type:pick.type,navTitle:v.navTitle,eyebrow:v.eyebrow||v.navTitle.toUpperCase(),title:v.title,subtitle:v.subtitle||'',slug,sections:[],items:[]}); await sset('site:pages',list); await refreshCustomNavigation(); showToast('Page created.'); render();
+}
+async function editCustomPage(id){const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===id);if(!pg)return;const v=await openFormModal({title:'Edit page',fields:[{name:'navTitle',label:'Navigation name',value:pg.navTitle},{name:'eyebrow',label:'Eyebrow',value:pg.eyebrow},{name:'title',label:'Page title',value:pg.title},{name:'subtitle',label:'Intro / description',type:'textarea',value:pg.subtitle},{name:'slug',label:'URL slug',value:pg.slug}],submitLabel:'Save changes'});if(!v)return;const slug=(v.slug||pg.slug).toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');if(list.some(x=>x.id!==id&&x.slug===slug)){showToast('That URL slug is already in use.');return;}Object.assign(pg,{navTitle:v.navTitle,eyebrow:v.eyebrow,title:v.title,subtitle:v.subtitle,slug});await sset('site:pages',list);await refreshCustomNavigation();showToast('Page updated.');render();}
+async function deleteCustomPage(id){const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===id);if(!pg)return;const ok=await openConfirmModal(`Delete “${pg.navTitle||pg.title}” and everything inside it? This cannot be undone.`,true);if(!ok)return;await sset('site:pages',list.filter(x=>x.id!==id));if(state.customPageId===id){state.customPageId=null;await refreshCustomNavigation();go('home');}else{await refreshCustomNavigation();showToast('Page deleted.');render();}}
+async function moveCustomPage(id,direction){const list=(await sget('site:pages'))||[];const i=list.findIndex(x=>x.id===id),j=i+direction;if(i<0||j<0||j>=list.length)return;[list[i],list[j]]=[list[j],list[i]];await sset('site:pages',list);await refreshCustomNavigation();render();}
+async function addCustomSection(pageId){const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;const v=await openFormModal({title:'Add section',fields:[{name:'heading',label:'Section heading'},{name:'body',label:'Body',type:'textarea'},{name:'imageUrl',label:'Image URL (optional)',dashed:true},{name:'linkUrl',label:'Link URL (optional)'},{name:'linkLabel',label:'Link label (optional)'}],submitLabel:'Add section'});if(!v||!v.heading)return;pg.sections=pg.sections||[];pg.sections.push({id:uid(),...v});await sset('site:pages',list);showToast('Section added.');render();}
+async function addCustomGalleryItem(pageId){const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;const v=await openFormModal({title:'Add image',desc:'The image keeps its original aspect ratio.',fields:[{name:'file',label:'Choose an image',type:'file',maxDim:1400,quality:.75},{name:'caption',label:'Caption (optional)'}],submitLabel:'Add image'});if(!v||!v.file)return;const id=uid();if(v.file.length>950000){showToast('That image is too large after compression.');return;}if(!await sset('custompage:image:'+pageId+':'+id,v.file)){showToast('Upload failed.');return;}pg.items=pg.items||[];pg.items.push({id,caption:v.caption||''});await sset('site:pages',list);showToast('Image added.');render();}
+async function addCustomItem(pageId){const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;const ref=pg.type==='references';const v=await openFormModal({title:ref?'Add reference':'Add record',fields:[{name:'title',label:ref?'Reference / LOR title':'Record title'},{name:'meta',label:'From / date / context (optional)'},{name:'body',label:'Text / note (optional)',type:'textarea'},{name:'linkUrl',label:'Link (optional)',dashed:true},{name:'linkLabel',label:'Link label (optional)'}],submitLabel:ref?'Add reference':'Add record'});if(!v||!v.title)return;pg.items=pg.items||[];pg.items.push({id:uid(),...v});await sset('site:pages',list);showToast(ref?'Reference added.':'Record added.');render();}
+async function editCustomItem(pageId,itemId){const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;const it=(pg.items||[]).find(x=>x.id===itemId);if(!it)return;const v=await openFormModal({title:'Edit item',fields:[{name:'title',label:'Title',value:it.title},{name:'meta',label:'From / date / context',value:it.meta},{name:'body',label:'Text / note',type:'textarea',value:it.body},{name:'linkUrl',label:'Link',value:it.linkUrl,dashed:true},{name:'linkLabel',label:'Link label',value:it.linkLabel}],submitLabel:'Save changes'});if(!v)return;Object.assign(it,v);await sset('site:pages',list);render();}
+async function deleteCustomItem(pageId,itemId){const ok=await openConfirmModal('Remove this item from the page?',true);if(!ok)return;const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;pg.items=(pg.items||[]).filter(x=>x.id!==itemId);await sset('site:pages',list);render();}
+async function editCustomSection(pageId,sectionId){const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;const sec=(pg.sections||[]).find(x=>x.id===sectionId);if(!sec)return;const v=await openFormModal({title:'Edit section',fields:[{name:'heading',label:'Section heading',value:sec.heading},{name:'body',label:'Body',type:'textarea',value:sec.body},{name:'imageUrl',label:'Image URL',value:sec.imageUrl,dashed:true},{name:'linkUrl',label:'Link URL',value:sec.linkUrl},{name:'linkLabel',label:'Link label',value:sec.linkLabel}],submitLabel:'Save changes'});if(!v)return;Object.assign(sec,v);await sset('site:pages',list);render();}
+async function deleteCustomSection(pageId,sectionId){const ok=await openConfirmModal('This section will be removed.',true);if(!ok)return;const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;pg.sections=(pg.sections||[]).filter(x=>x.id!==sectionId);await sset('site:pages',list);render();}
+async function moveCustomSection(pageId,sectionId,direction){const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;const a=pg.sections||[];const i=a.findIndex(x=>x.id===sectionId),j=i+direction;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];await sset('site:pages',list);render();}
+async function moveCustomItem(pageId,itemId,direction){const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;const a=pg.items||[];const i=a.findIndex(x=>x.id===itemId),j=i+direction;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];await sset('site:pages',list);render();}
+async function deleteCustomGalleryItem(pageId,itemId){const ok=await openConfirmModal('Remove this image from the gallery?',true);if(!ok)return;const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===pageId);if(!pg)return;pg.items=(pg.items||[]).filter(x=>x.id!==itemId);await sset('site:pages',list);try{await window.fbDeleteDoc(window.fbDoc(window.fbDb,'portfolio','custompage:image:'+pageId+':'+itemId));}catch(e){}render();}
+async function pageCustomPage(id){
+  const list=(await sget('site:pages'))||[];const pg=list.find(x=>x.id===id);if(!pg)return '<div class="page-head"><div class="eyebrow">PAGE NOT FOUND</div><h2 class="section-title">This page has moved.</h2></div>';const admin=state.isAdmin;let content='';
+  if(pg.type==='gallery'){const items=await Promise.all((pg.items||[]).map(async it=>({...it,url:await sget('custompage:image:'+pg.id+':'+it.id)})));content=`<div class="masonry">${items.filter(x=>x.url).map(it=>`<div class="ph"><img src="${it.url}" alt="${esc(it.caption)}" loading="lazy"><div class="cap"><span>${esc(it.caption||'')}</span>${admin?`<button class="btn-sm outline" onclick="deleteCustomGalleryItem('${pg.id}','${it.id}')">&times;</button>`:''}</div></div>`).join('')||'<div class="empty">No images added yet.</div>'}</div>`;
+  } else if(pg.type==='references'||pg.type==='records'){const items=pg.items||[];content=items.map((it,i)=>`<div class="block"><span class="reference-mark">${String(i+1).padStart(2,'0')}</span><h3>${esc(it.title)}</h3>${it.meta?`<div class="reference-meta">${esc(it.meta)}</div>`:''}${it.body?`<p>${esc(it.body).replace(/\n/g,'<br>')}</p>`:''}${it.linkUrl?`<p><a class="link" href="${esc(it.linkUrl)}" target="_blank" rel="noopener">${esc(it.linkLabel||'Open')} &rarr;</a></p>`:''}${admin?`<div class="block-actions"><button class="btn-sm outline" onclick="editCustomItem('${pg.id}','${it.id}')">Edit</button><button class="btn-sm outline" onclick="deleteCustomItem('${pg.id}','${it.id}')">Delete</button><button class="btn-sm outline" onclick="moveCustomItem('${pg.id}','${it.id}',-1)">&uarr;</button><button class="btn-sm outline" onclick="moveCustomItem('${pg.id}','${it.id}',1)">&darr;</button></div>`:''}</div>`).join('')||'<div class="empty">Nothing has been added yet.</div>';
+  } else {const sections=pg.sections||[];content=sections.map(sec=>`<div class="block"><h3>${esc(sec.heading)}</h3>${sec.imageUrl?`<img src="${esc(sec.imageUrl)}" alt="">`:''}${sec.body?`<p>${esc(sec.body).replace(/\n/g,'<br>')}</p>`:''}${sec.linkUrl?`<p><a class="link" href="${esc(sec.linkUrl)}" target="_blank" rel="noopener">${esc(sec.linkLabel||'Open link')} &rarr;</a></p>`:''}${admin?`<div class="block-actions"><button class="btn-sm outline" onclick="editCustomSection('${pg.id}','${sec.id}')">Edit</button><button class="btn-sm outline" onclick="deleteCustomSection('${pg.id}','${sec.id}')">Delete</button><button class="btn-sm outline" onclick="moveCustomSection('${pg.id}','${sec.id}',-1)">&uarr;</button><button class="btn-sm outline" onclick="moveCustomSection('${pg.id}','${sec.id}',1)">&darr;</button></div>`:''}</div>`).join('')||'<div class="empty">No content has been added to this page yet.</div>';}
+  let add='';if(admin){if(pg.type==='sections')add=`<div class="add-box" onclick="addCustomSection('${pg.id}')">+ Add a section</div>`;else if(pg.type==='gallery')add=`<div class="add-box" onclick="addCustomGalleryItem('${pg.id}')">+ Add an image</div>`;else add=`<div class="add-box" onclick="addCustomItem('${pg.id}')">+ Add ${pg.type==='references'?'a reference':'a record'}</div>`;}
+  return `<div class="page-head"><div class="eyebrow">${esc(pg.eyebrow||pg.navTitle)}</div><h2 class="section-title">${esc(pg.title)}</h2>${pg.subtitle?`<p class="section-sub">${esc(pg.subtitle)}</p>`:''}</div>${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; editing ${esc(pg.navTitle)}</div>`:''}${add}${content}`;
+}
+async function refreshCustomNavigation(){const list=(await sget('site:pages'))||[];const nav=document.getElementById('customNavLinks'),foot=document.getElementById('customFooterLinks');const links=list.map(pg=>`<a onclick="go('custom',{customPageId:'${pg.id}'})" data-custom-id="${pg.id}">${esc(pg.navTitle)}</a>`).join('');if(nav)nav.innerHTML=links;if(foot)foot.innerHTML=list.map(pg=>`<a onclick="go('custom',{customPageId:'${pg.id}'})">${esc(pg.navTitle)}</a>`).join('');}
 
 /* ---------------- FLAPERON (aviation research) ---------------- */
 async function pageFlaperon(){
@@ -763,7 +840,7 @@ async function pagePhotography(){
   return `
   <div class="page-head">
     <div class="eyebrow">PHOTOGRAPHY</div>
-    <h2 class="section-title">Frames from @theprofiletwo.</h2>
+    <h2 class="section-title">Frames from Project Flaperon.</h2>
     <p class="section-sub">A visual log &mdash; shot, developed, and filed by Aarav.</p>
   </div>
   ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; upload photos below</div>
@@ -812,6 +889,10 @@ async function pageProjects(){
       ${admin?`<div class="block-actions">
         <button class="btn-sm outline" onclick="editProject('${s.id}')">Edit</button>
         <button class="btn-sm outline" onclick="deleteProject('${s.id}')">Delete</button>
+        <div class="reorder-actions" aria-label="Reorder section">
+          <button class="btn-sm outline" title="Move up" onclick="moveProject('${s.id}',-1)">&uarr;</button>
+          <button class="btn-sm outline" title="Move down" onclick="moveProject('${s.id}',1)">&darr;</button>
+        </div>
       </div>`:''}
     </div>`).join('') : `<div class="empty">No project sections yet.</div>`;
   return `
@@ -857,6 +938,16 @@ async function editProject(id){
   await sset('projects:sections', list);
   render();
 }
+async function moveProject(id, direction){
+  const list = (await sget('projects:sections')) || [];
+  const i = list.findIndex(x=>x.id===id);
+  const j = i + direction;
+  if(i < 0 || j < 0 || j >= list.length) return;
+  [list[i], list[j]] = [list[j], list[i]];
+  await sset('projects:sections', list);
+  render();
+}
+
 async function deleteProject(id){
   const ok = await openConfirmModal('This section will be removed from the Projects page.', true);
   if(!ok) return;
@@ -883,6 +974,10 @@ async function pageExperience(){
         <button class="btn-sm outline" onclick="addSub('${s.id}')">+ Add subsection</button>
         <button class="btn-sm outline" onclick="editExpTitle('${s.id}')">Edit title</button>
         <button class="btn-sm outline" onclick="deleteExp('${s.id}')">Delete section</button>
+        <div class="reorder-actions" aria-label="Reorder section">
+          <button class="btn-sm outline" title="Move up" onclick="moveExp('${s.id}',-1)">&uarr;</button>
+          <button class="btn-sm outline" title="Move down" onclick="moveExp('${s.id}',1)">&darr;</button>
+        </div>
       </div>`:''}
     </div>`).join('') : `<div class="empty">No experience sections yet.</div>`;
   return `
@@ -912,6 +1007,16 @@ async function editExpTitle(id){
   await sset('experience:sections', list);
   render();
 }
+async function moveExp(id, direction){
+  const list = (await sget('experience:sections')) || [];
+  const i = list.findIndex(x=>x.id===id);
+  const j = i + direction;
+  if(i < 0 || j < 0 || j >= list.length) return;
+  [list[i], list[j]] = [list[j], list[i]];
+  await sset('experience:sections', list);
+  render();
+}
+
 async function deleteExp(id){
   const ok = await openConfirmModal('This whole section and its subsections will be removed.', true);
   if(!ok) return;
@@ -940,6 +1045,86 @@ async function deleteSub(id, idx){
   render();
 }
 
+/* ---------------- REFERENCES ---------------- */
+async function pageReferences(){
+  const list = (await sget('references:entries')) || [];
+  const admin = state.isAdmin;
+  const blocks = list.length ? list.map((r,i)=>`
+    <div class="block reference-block">
+      <span class="reference-mark">0${i+1}</span>
+      <h3>${esc(r.title||'Reference')}</h3>
+      ${r.meta?`<div class="reference-meta">${esc(r.meta)}</div>`:''}
+      ${r.body?`<p>${esc(r.body).replace(/\n/g,'<br>')}</p>`:''}
+      ${r.linkUrl?`<p><a class="link" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">${esc(r.linkLabel||'Open reference')} &rarr;</a></p>`:''}
+      ${admin?`<div class="block-actions">
+        <button class="btn-sm outline" onclick="editReference('${r.id}')">Edit</button>
+        <button class="btn-sm outline" onclick="deleteReference('${r.id}')">Delete</button>
+        <div class="reorder-actions"><button class="btn-sm outline" onclick="moveReference('${r.id}',-1)" title="Move up">&uarr;</button><button class="btn-sm outline" onclick="moveReference('${r.id}',1)" title="Move down">&darr;</button></div>
+      </div>`:''}
+    </div>`).join('') : `
+      <div class="reference-empty">
+        <div class="label" style="font-family:'Press Start 2P',monospace; font-size:10px; margin-bottom:12px;">REFERENCES / PENDING</div>
+        <div style="font-size:14px; line-height:1.7; color:var(--muted);">Letters, testimonials, and references will appear here when they are ready.</div>
+      </div>`;
+  return `
+  <div class="page-head">
+    <div class="eyebrow">REFERENCES</div>
+    <h2 class="section-title">Words from the room.</h2>
+    <p class="section-sub">A small archive of recommendations, testimonials, and letters that speak to the work.</p>
+  </div>
+  ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE &mdash; references can be added when you have them</div>
+  <div class="add-box" onclick="addReference()">+ Add a reference</div>`:''}
+  ${blocks}`;
+}
+async function addReference(){
+  const v = await openFormModal({
+    title:'Add reference',
+    fields:[
+      {name:'title', label:'Reference title', placeholder:'e.g. Letter of Recommendation'},
+      {name:'meta', label:'From / context (optional)', placeholder:'e.g. School Principal'},
+      {name:'body', label:'Excerpt or note (optional)', type:'textarea'},
+      {name:'linkUrl', label:'Link to full letter (optional)', dashed:true},
+      {name:'linkLabel', label:'Link label (optional)', placeholder:'Read the letter'}
+    ], submitLabel:'Add reference'});
+  if(!v || !v.title) return;
+  const list = (await sget('references:entries')) || [];
+  list.push({id:uid(), ...v});
+  await sset('references:entries', list);
+  showToast('Reference added.');
+  render();
+}
+async function editReference(id){
+  const list = (await sget('references:entries')) || [];
+  const r = list.find(x=>x.id===id); if(!r) return;
+  const v = await openFormModal({title:'Edit reference', fields:[
+    {name:'title', label:'Reference title', value:r.title},
+    {name:'meta', label:'From / context', value:r.meta},
+    {name:'body', label:'Excerpt or note', type:'textarea', value:r.body},
+    {name:'linkUrl', label:'Link to full letter', value:r.linkUrl, dashed:true},
+    {name:'linkLabel', label:'Link label', value:r.linkLabel}
+  ], submitLabel:'Save changes'});
+  if(!v) return;
+  Object.assign(r,v);
+  await sset('references:entries', list);
+  render();
+}
+async function deleteReference(id){
+  const ok = await openConfirmModal('This reference will be removed from the public page.', true);
+  if(!ok) return;
+  let list = (await sget('references:entries')) || [];
+  list = list.filter(x=>x.id!==id);
+  await sset('references:entries', list);
+  render();
+}
+async function moveReference(id, direction){
+  const list = (await sget('references:entries')) || [];
+  const i=list.findIndex(x=>x.id===id), j=i+direction;
+  if(i<0 || j<0 || j>=list.length) return;
+  [list[i],list[j]]=[list[j],list[i]];
+  await sset('references:entries', list);
+  render();
+}
+
 /* ---------------- MUN ---------------- */
 async function pageMunList(){
   const confs = (await sget('mun:conferences')) || [];
@@ -957,7 +1142,10 @@ async function pageMunList(){
           <h3>${esc(c.name)}</h3>
           <div class="code">CODE // ${c.code}</div>
         </div>
-        <span class="status ${live?'live':'pending'}">${live?'PUBLISHED':'PENDING'}</span>
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          <span class="status ${live?'live':'pending'}">${live?'PUBLISHED':'PENDING'}</span>
+          ${admin?`<button class="btn-sm outline" title="Delete conference" onclick="event.stopPropagation(); deleteConf('${c.code}')">&times;</button>`:''}
+        </div>
       </div>`;
     });
   } else {
@@ -989,6 +1177,20 @@ async function pageMunList(){
   ${admin?`<div class="admin-bar"><span class="adot"></span>ADMIN MODE</div>`:''}
   <div class="index-grid">${indexBox}${panel}</div>`;
 }
+async function deleteConf(code){
+  const ok = await openConfirmModal('This conference, its marksheet, and its delegate chat will be permanently removed.', true);
+  if(!ok) return;
+  let confs = (await sget('mun:conferences')) || [];
+  confs = confs.filter(c=>c.code!==code);
+  await sset('mun:conferences', confs);
+  try{ await window.firebaseReady; await window.fbDeleteDoc(window.fbDoc(window.fbDb, 'portfolio', 'mun:conf:'+code)); }catch(e){}
+  dataCache.delete('mun:conf:'+code);
+  try{ localStorage.removeItem(CACHE_PREFIX+'mun:conf:'+code); }catch(e){}
+  if(state.munCode===code) state.munCode=null;
+  showToast('Conference deleted.');
+  render();
+}
+
 async function addConf(){
   const name = document.getElementById('mc-name').value.trim();
   if(!name){ showToast('Give the conference a name first.'); return; }
@@ -1189,12 +1391,15 @@ Object.assign(window, {
   addProject,
   editProject,
   deleteProject,
+  moveProject,
   addExp,
   editExpTitle,
   deleteExp,
+  moveExp,
   addSub,
   deleteSub,
   addConf,
+  deleteConf,
   setDel,
   setDelVal,
   addDel,
@@ -1202,11 +1407,39 @@ Object.assign(window, {
   addCol,
   removeCol,
   publishConf,
-  sendChat
+  sendChat,
+  addReference,
+  editReference,
+  deleteReference,
+  moveReference,
+  addCustomPage,
+  editCustomPage,
+  deleteCustomPage,
+  moveCustomPage,
+  addCustomSection,
+  editCustomSection,
+  deleteCustomSection,
+  moveCustomSection,
+  refreshCustomNavigation,
+  renderCustomPageAdminList,
+  addCustomGalleryItem,
+  addCustomItem,
+  editCustomItem,
+  deleteCustomItem,
+  moveCustomItem,
+  deleteCustomGalleryItem
 });
 // Home is entirely static, so paint it immediately while Firebase finishes loading.
 go('home');
 requestAnimationFrame(finishInitialLoad);
+refreshCustomNavigation().catch(()=>{});
+// Create the references collection shape in Firestore once, without delaying first paint.
+(async()=>{
+  try{
+    const existing = await sget('references:entries');
+    if(existing === null) await sset('references:entries', []);
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
