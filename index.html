@@ -1,14 +1,4 @@
 <!DOCTYPE html>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-  const supabase = window.supabase.createClient(
-    'https://hjudhrdmbfvwrdsqijex.supabase.co',
-    'sb_publishable_gaqX9ura0jETRuzJo9hl1w_hcarOxhH'
-  );
-</script>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -31,7 +21,8 @@
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
-  html,body{margin:0;padding:0;}
+  html,body{margin:0; padding:0; overflow-x:hidden; width:100%;}
+  h1,h2,h3,.pixel{overflow-wrap:break-word; word-break:break-word;}
   body{
     background:var(--cream);
     background-image:radial-gradient(var(--ink) .6px, transparent .6px);
@@ -67,8 +58,8 @@
   .mobile-toggle{display:none; font-size:22px; background:none; border:none; transition:transform .2s ease;}
   .mobile-toggle:active{transform:scale(.9);}
 
-  #app{min-height:70vh; padding:120px 0 90px;}
-  @media(max-width:900px){ #app{padding:96px 0 70px;} }
+  #app{min-height:70vh; padding-top:120px; padding-bottom:90px;}
+  @media(max-width:900px){ #app{padding-top:96px; padding-bottom:70px;} }
   #app{transition:opacity .32s ease, transform .32s ease; opacity:1; transform:translateY(0);}
   #app.page-out{opacity:0; transform:translateY(10px);}
   @keyframes dropIn{ from{opacity:0; transform:translateY(-8px);} to{opacity:1; transform:translateY(0);} }
@@ -96,7 +87,19 @@
   .console-art{flex:1; display:flex; align-items:center; justify-content:center; padding:34px 0;}
   .console-art svg{width:96px; height:96px;}
   .console-tags{font-family:'Press Start 2P', monospace; font-size:14px; line-height:2.2;}
-  .console-foot{font-size:11px; font-family:'Press Start 2P', monospace; margin-top:22px; line-height:1.8; opacity:.8;}
+  .console-foot{font-size:11px; font-family:'Press Start 2P', monospace; margin-top:22px; line-height:1.8; opacity:.8; cursor:pointer; transition:opacity .15s ease, transform .15s ease; display:inline-block;}
+  .console-foot:hover{opacity:1; transform:translateY(2px);}
+
+  .explore-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:22px; margin-top:64px; scroll-margin-top:120px;}
+  .explore-tile{border:2px solid var(--ink); padding:24px; min-height:220px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; box-shadow:6px 6px 0 var(--ink); transition:transform .15s ease, box-shadow .15s ease; animation:fadeUp .45s ease both;}
+  .explore-tile:hover{transform:translate(3px,3px); box-shadow:3px 3px 0 var(--ink);}
+  .explore-tile .num{font-family:'Press Start 2P', monospace; font-size:11px;}
+  .explore-tile h3{font-size:22px; margin:26px 0 0; line-height:1.4;}
+  .explore-tile .arrow{font-size:22px; align-self:flex-end;}
+  .tile-orange{background:var(--orange); color:var(--cream);}
+  .tile-ink{background:var(--ink); color:var(--cream);}
+  .tile-sage{background:var(--cream-2); color:var(--ink);}
+  @media(max-width:900px){.explore-grid{grid-template-columns:1fr; margin-top:48px;}}
 
   .section-title{font-size:26px; margin:0 0 10px;}
   .section-sub{color:var(--muted); font-size:15px; margin-bottom:36px; max-width:64ch;}
@@ -234,6 +237,19 @@
   }
   @media(max-width:900px){
     nav.links.open{display:flex; flex-direction:column; position:absolute; top:74px; left:0; right:0; background:var(--cream); border-bottom:3px solid var(--ink); padding:20px 32px; gap:16px;}
+  }
+  @media(max-width:640px){
+    .wrap{padding:0 20px;}
+    .navbar{padding:16px 20px;}
+    nav.links.open{padding:20px;}
+    h1.display{font-size:28px;}
+    .lede{font-size:16px;}
+    .console{padding:20px 20px 24px;}
+    .console-tags{font-size:12px;}
+    .index-box, .panel-box, .block{padding:18px;}
+    .research-row{padding:16px;}
+    table.marks th, table.marks td{padding:8px;}
+    .footer-heading{font-size:24px;}
   }
 </style>
 </head>
@@ -507,7 +523,25 @@ function pageHome(){
         </svg>
       </div>
       <div class="console-tags">STUDENT LEADER<br>MUNER / FOUNDER<br>AVIATION RESEARCHER</div>
-      <div class="console-foot">PRESS START TO<br>EXPLORE &darr;</div>
+      <div class="console-foot" onclick="document.getElementById('explore').scrollIntoView({behavior:'smooth'})">PRESS START TO<br>EXPLORE &darr;</div>
+    </div>
+  </section>
+
+  <section id="explore" class="explore-grid">
+    <div class="explore-tile tile-orange" onclick="go('mun')">
+      <div><span class="num">01 / MUN</span></div>
+      <h3>Rooms are built<br>for dialogue.</h3>
+      <span class="arrow">&#8599;</span>
+    </div>
+    <div class="explore-tile tile-ink" onclick="go('flaperon')">
+      <div><span class="num">02 / PROJECT FLAPERON</span></div>
+      <h3>Curiosity,<br>with wings.</h3>
+      <span class="arrow">&#8599;</span>
+    </div>
+    <div class="explore-tile tile-sage" onclick="go('photography')">
+      <div><span class="num">03 / PHOTOGRAPHY</span></div>
+      <h3>Frames from<br>the in-between.</h3>
+      <span class="arrow">&#8599;</span>
     </div>
   </section>`;
 }
