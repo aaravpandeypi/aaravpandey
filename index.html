@@ -7,8 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+  // Load Firebase in the background so the static shell can paint immediately.
+  window.firebaseReady = (async () => {
+    const [{ initializeApp }, { getFirestore, doc, getDoc, setDoc, deleteDoc }] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js")
+    ]);
 
   const firebaseConfig = {
     apiKey: "AIzaSyBK9x_XJ4nblZT6FTDYeCZ-RhAVRsoGl74",
@@ -32,6 +36,7 @@
   window.fbSetDoc = setDoc;
   window.fbDeleteDoc = deleteDoc;
   window.fbDb = fbDb;
+  })();
 </script>
 <style>
   :root{
@@ -89,6 +94,14 @@
   @media(max-width:900px){ #app{padding-top:96px; padding-bottom:70px;} }
   #app{transition:opacity .32s ease, transform .32s ease; opacity:1; transform:translateY(0);}
   #app.page-out{opacity:0; transform:translateY(10px);}
+  .site-loader{position:fixed;inset:0;z-index:1000;background:var(--cream);display:flex;align-items:center;justify-content:center;transition:opacity .28s ease,visibility .28s ease;}
+  .site-loader.done{opacity:0;visibility:hidden;pointer-events:none;}
+  .loader-box{border:3px solid var(--ink);background:var(--sage);box-shadow:7px 7px 0 var(--ink);padding:24px 28px;min-width:250px;text-align:center;}
+  .loader-label{font-family:'Press Start 2P',monospace;font-size:11px;line-height:1.8;}
+  .loader-status{font-size:12px;margin-top:12px;opacity:.75;}
+  .loader-bar{height:8px;border:2px solid var(--ink);margin-top:18px;background:var(--cream);overflow:hidden;}
+  .loader-bar span{display:block;height:100%;width:35%;background:var(--orange);animation:loaderPulse 1s ease-in-out infinite;}
+  @keyframes loaderPulse{0%{transform:translateX(-110%)}100%{transform:translateX(320%)}}
   @keyframes dropIn{ from{opacity:0; transform:translateY(-8px);} to{opacity:1; transform:translateY(0);} }
   @keyframes fadeUp{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
 
@@ -301,6 +314,14 @@
 
 <main class="wrap" id="app"></main>
 
+<div class="site-loader" id="siteLoader" aria-hidden="true">
+  <div class="loader-box">
+    <div class="loader-label">AP_SYSTEM</div>
+    <div class="loader-status">INITIALISING / 01</div>
+    <div class="loader-bar"><span></span></div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap footer-grid">
     <div>
@@ -331,17 +352,53 @@
 /* ---------------- STATE & STORAGE HELPERS (Firestore-backed) ---------------- */
 const state = { page:'home', munCode:null, isAdmin:false };
 
-async function sget(key){
+const dataCache = new Map();
+const pendingReads = new Map();
+const CACHE_PREFIX = 'ap_portfolio:';
+
+function readLocalCache(key){
   try{
-    const snap = await window.fbGetDoc(window.fbDoc(window.fbDb, 'portfolio', key));
-    if(!snap.exists()) return null;
-    const data = snap.data();
-    return data.value !== undefined ? JSON.parse(data.value) : null;
-  } catch(e){ console.error('sget failed for', key, e); return null; }
+    const raw = localStorage.getItem(CACHE_PREFIX + key);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e){ return null; }
+}
+function writeLocalCache(key, value){
+  try{ localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(value)); } catch(e){}
+}
+async function sget(key){
+  if(dataCache.has(key)) return dataCache.get(key);
+  const cached = readLocalCache(key);
+  if(cached !== null){
+    dataCache.set(key, cached);
+    refreshSget(key);
+    return cached;
+  }
+  return refreshSget(key);
+}
+async function refreshSget(key){
+  if(pendingReads.has(key)) return pendingReads.get(key);
+  const request = (async ()=>{
+    try{
+      await window.firebaseReady;
+      const snap = await window.fbGetDoc(window.fbDoc(window.fbDb, 'portfolio', key));
+      if(!snap.exists()){ dataCache.set(key, null); return null; }
+      const data = snap.data();
+      const value = data.value !== undefined ? JSON.parse(data.value) : null;
+      dataCache.set(key, value);
+      writeLocalCache(key, value);
+      return value;
+    } catch(e){ console.error('sget failed for', key, e); return dataCache.get(key) ?? null; }
+    finally{ pendingReads.delete(key); }
+  })();
+  pendingReads.set(key, request);
+  return request;
 }
 async function sset(key, value){
   try{
+    await window.firebaseReady;
     await window.fbSetDoc(window.fbDoc(window.fbDb, 'portfolio', key), { value: JSON.stringify(value) });
+    dataCache.set(key, value);
+    writeLocalCache(key, value);
     return true;
   } catch(e){ console.error('sset failed for', key, e); return false; }
 }
@@ -890,8 +947,9 @@ async function pageMunList(){
 
   let tiles = '';
   if(confs.length){
-    for(const c of confs){
-      const data = await sget('mun:conf:'+c.code);
+    const details = await Promise.all(confs.map(c=>sget('mun:conf:'+c.code)));
+    confs.forEach((c,i)=>{
+      const data = details[i];
       const live = data && data.published;
       tiles += `
       <div class="conf-tile" onclick="go('mun-detail', {munCode:'${c.code}'})">
@@ -901,7 +959,7 @@ async function pageMunList(){
         </div>
         <span class="status ${live?'live':'pending'}">${live?'PUBLISHED':'PENDING'}</span>
       </div>`;
-    }
+    });
   } else {
     tiles = `<div class="empty">No conferences added yet.</div>`;
   }
@@ -1114,6 +1172,12 @@ async function sendChat(code){
 }
 
 /* ---------------- INIT ---------------- */
+function finishInitialLoad(){
+  const loader = document.getElementById('siteLoader');
+  if(!loader) return;
+  loader.classList.add('done');
+  setTimeout(()=>loader.remove(), 320);
+}
 Object.assign(window, {
   go,
   toggleAdmin,
@@ -1140,7 +1204,9 @@ Object.assign(window, {
   publishConf,
   sendChat
 });
+// Home is entirely static, so paint it immediately while Firebase finishes loading.
 go('home');
+requestAnimationFrame(finishInitialLoad);
 </script>
 </body>
 </html>
