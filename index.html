@@ -237,8 +237,7 @@
   .rc-pv{color:var(--orange-dark); font-weight:bold;}
   .rc-absent{color:#a33; font-weight:bold;}
   .roll-select-wrap{position:relative;width:100%;min-width:78px;}
-  .roll-select-wrap .roll-code{position:absolute;inset:0;display:flex;align-items:center;padding:5px 28px 5px 8px;pointer-events:none;font-weight:700;z-index:1;}
-  .roll-select-wrap select{position:relative;z-index:2;background:transparent;color:transparent;}
+  .roll-select-wrap select{width:100%;cursor:pointer;}
   .roll-select-wrap select option{color:var(--ink);background:var(--cream);}
   table.marks tr.mun-winner td{background:#dfe8c9;}
   table.marks tr.mun-manual-highlight td{background:var(--mun-highlight,#f4df9a);}
@@ -1182,11 +1181,25 @@ function munWinnerIndexes(data){
 }
 function munRollSelect(code,i,day,value){
   const v=munRollCallCode(value);
-  return `<div class="roll-select-wrap"><span class="roll-code ${v==='P'?'rc-present':v==='A'?'rc-absent':'rc-pv'}">${v}</span><select aria-label="Roll call Day ${day+1}" onchange="setRollCall('${code}',${i},${day},this.value);updateRollCallDisplay(this)"><option value="P" ${v==='P'?'selected':''}>Present</option><option value="PV" ${v==='PV'?'selected':''}>Present &amp; Voting</option><option value="A" ${v==='A'?'selected':''}>Absent</option></select></div>`;
+  return `<div class="roll-select-wrap"><select aria-label="Roll call Day ${day+1}" onfocus="expandRollCallOptions(this)" onchange="handleRollCallChange(this,'${code}',${i},${day})" onblur="collapseRollCallOptions(this)"><option value="P" ${v==='P'?'selected':''}>P</option><option value="PV" ${v==='PV'?'selected':''}>PV</option><option value="A" ${v==='A'?'selected':''}>A</option></select></div>`;
+}
+function expandRollCallOptions(select){
+  const labels={P:'Present',PV:'Present & Voting',A:'Absent'};
+  Array.from(select.options).forEach(o=>o.textContent=labels[o.value]||o.value);
+}
+function collapseRollCallOptions(select){
+  const labels={P:'P',PV:'PV',A:'A'};
+  Array.from(select.options).forEach(o=>o.textContent=labels[o.value]||o.value);
 }
 function updateRollCallDisplay(select){
-  const code=munRollCallCode(select.value), span=select.parentElement&&select.parentElement.querySelector('.roll-code');
-  if(!span)return; span.textContent=code; span.className='roll-code '+(code==='P'?'rc-present':code==='A'?'rc-absent':'rc-pv');
+  collapseRollCallOptions(select);
+  select.value=munRollCallCode(select.value);
+  void select.offsetWidth;
+}
+function handleRollCallChange(select,code,i,day){
+  // The select itself displays the abbreviation immediately; the full labels are only used while choosing.
+  updateRollCallDisplay(select);
+  void setRollCall(code,i,day,select.value);
 }
 function munRowClass(d,i,winners){
   if(d.highlight && d.highlight.mode==='manual' && d.highlight.color)return 'mun-manual-highlight';
