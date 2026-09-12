@@ -1329,25 +1329,36 @@ async function removeDel(code,i){const ok=await openConfirmModal('Remove this de
 async function addCol(code){const v=await openFormModal({title:'Add marks column',fields:[{name:'name',label:'Column name',placeholder:'e.g. Working Paper'}],submitLabel:'Add'});if(!v||!v.name)return;const data=await sget('mun:conf:'+code);if(!data.columns.includes(v.name))data.columns.push(v.name);await sset('mun:conf:'+code,data);render();}
 async function removeCol(code,col){const ok=await openConfirmModal(`Remove the column "${col}" from every delegation?`,true);if(!ok)return;const data=await sget('mun:conf:'+code);data.columns=data.columns.filter(c=>c!==col);await sset('mun:conf:'+code,data);render();}
 async function publishConf(code){
-  const saved=await sget('site:admin-passcode');
-  const v=await openFormModal({title:'Publish marksheet',desc:'The current marksheet will be arranged highest-to-lowest by TOTAL and then published. Your draft remains saved.',fields:[{name:'p',label:'Admin passcode',type:'password'}],submitLabel:'Publish'});
-  if(!v)return;
-  if(v.p!==saved){showToast('Incorrect passcode. Not published.');return;}
-  const data=await arrangeMunMarksheet(code,true);
-  if(!data)return;
-  data.published=true;data.draft=false;data.publishedAt=Date.now();
-  await sset('mun:conf:'+code,data);
-  showToast('Marksheet arranged and published.');render();
+  try{
+    const saved=await sget('site:admin-passcode');
+    if(!saved){showToast('No admin passcode is set.');return;}
+    const v=await openFormModal({title:'Publish marksheet',desc:'The current marksheet will be arranged highest-to-lowest by TOTAL and then published. Your draft remains saved.',fields:[{name:'p',label:'Admin passcode',type:'password'}],submitLabel:'Publish'});
+    if(!v)return;
+    if(v.p!==saved){showToast('Incorrect passcode. Not published.');return;}
+    const data=await arrangeMunMarksheet(code,true);
+    if(!data){showToast('Conference data could not be loaded.');return;}
+    data.published=true;data.draft=false;data.publishedAt=Date.now();
+    const ok=await sset('mun:conf:'+code,data);
+    if(!ok){showToast('Publish failed — check your Firestore connection/rules.');return;}
+    showToast('Marksheet arranged and published.');
+    await render();
+  }catch(e){console.error('publishConf failed',e);showToast('Publish failed. Please try again.');}
 }
 async function unpublishConf(code){
-  const saved=await sget('site:admin-passcode');
-  const v=await openFormModal({title:'Unpublish marksheet',desc:'This will remove the public results from the conference page. Your saved marksheet will remain intact and editable.',fields:[{name:'p',label:'Admin passcode',type:'password'}],submitLabel:'Unpublish'});
-  if(!v)return;
-  if(v.p!==saved){showToast('Incorrect passcode. Still published.');return;}
-  const data=await sget('mun:conf:'+code);if(!data)return;
-  data.published=false;data.draft=true;
-  await sset('mun:conf:'+code,data);
-  showToast('Marksheet unpublished. The draft is still saved.');render();
+  try{
+    const saved=await sget('site:admin-passcode');
+    if(!saved){showToast('No admin passcode is set.');return;}
+    const v=await openFormModal({title:'Unpublish marksheet',desc:'This will remove the public results from the conference page. Your saved marksheet will remain intact and editable.',fields:[{name:'p',label:'Admin passcode',type:'password'}],submitLabel:'Unpublish'});
+    if(!v)return;
+    if(v.p!==saved){showToast('Incorrect passcode. Still published.');return;}
+    const data=await sget('mun:conf:'+code);
+    if(!data){showToast('Conference data could not be loaded.');return;}
+    data.published=false;data.draft=true;
+    const ok=await sset('mun:conf:'+code,data);
+    if(!ok){showToast('Unpublish failed — check your Firestore connection/rules.');return;}
+    showToast('Marksheet unpublished. The draft is still saved.');
+    await render();
+  }catch(e){console.error('unpublishConf failed',e);showToast('Unpublish failed. Please try again.');}
 }
 async function downloadMunExcel(code){
   const data=await sget('mun:conf:'+code); if(!data)return;
@@ -1443,6 +1454,10 @@ Object.assign(window, {
   removeCol,
   arrangeMunMarksheet,
   publishConf,
+  unpublishConf,
+  expandRollCallOptions,
+  collapseRollCallOptions,
+  handleRollCallChange,
   downloadMunExcel,
   openCountryMatrix,
   filterCountryMatrix,
