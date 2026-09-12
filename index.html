@@ -1171,6 +1171,36 @@ function munRollCallLabel(value){
 function munScoreTotal(d, cols){
   return cols.reduce((sum,c)=>{ const n=Number(d.values&&d.values[c]); return sum+(Number.isFinite(n)?n:0); },0);
 }
+function updateMunTotalsInDom(){
+  const table=document.querySelector('table.marks');
+  if(!table)return;
+  const headers=Array.from(table.querySelectorAll('thead th')).map(th=>th.textContent.trim());
+  const totalIndex=headers.findIndex(h=>h==='TOTAL');
+  if(totalIndex<0)return;
+  const rows=table.querySelectorAll('tbody tr');
+  rows.forEach(row=>{
+    const inputs=row.querySelectorAll('input[type=number]');
+    if(!inputs.length)return;
+    const total=Array.from(inputs).reduce((sum,input)=>{const n=Number(input.value);return sum+(Number.isFinite(n)?n:0)},0);
+    const cell=row.children[totalIndex];
+    if(cell)cell.textContent=total;
+  });
+}
+function refreshMunWinnerHighlightDom(){
+  const table=document.querySelector('table.marks');
+  if(!table)return;
+  const totalIndex=Array.from(table.querySelectorAll('thead th')).findIndex(th=>th.textContent.trim()==='TOTAL');
+  if(totalIndex<0)return;
+  const rows=Array.from(table.querySelectorAll('tbody tr'));
+  const totals=rows.map(row=>Number(row.children[totalIndex]?.textContent)||0);
+  const max=Math.max(...totals,0);
+  rows.forEach((row,i)=>{
+    const mode=row.querySelector('select[aria-label="Highlight mode"]')?.value;
+    if(mode==='manual')return;
+    row.classList.toggle('mun-winner',max>0 && totals[i]===max);
+    row.classList.remove('mun-manual-highlight');
+  });
+}
 function munWinnerIndexes(data){
   const delegates=data.delegates||[], cols=data.columns||[];
   if(!delegates.length || !cols.length) return new Set();
@@ -1270,13 +1300,27 @@ function munAdminPanel(code,data){
   const rows=(data.delegates||[]).map((d,i)=>{
     const hl=d.highlight||{mode:'auto',color:'#f4df9a'};
     const mode=hl.mode==='manual'?'manual':'auto', color=hl.color||'#f4df9a';
-    return `<tr class="${munRowClass(d,i,winners)}"${munRowStyle(d)}><td><input value="${esc(d.delegation)}" oninput="setDel('${code}',${i},'delegation',this.value)"></td>${Array.from({length:data.days},(_,day)=>`<td>${munRollSelect(code,i,day,d.rollCalls?.[day])}</td>`).join('')}${cols.map(c=>`<td><input type="number" value="${esc((d.values&&d.values[c])??'')}" oninput="setDelVal('${code}',${i},'${c.replace(/'/g,"\\'")}',this.value)"></td>`).join('')}<td class="total-cell">${munScoreTotal(d,cols)}</td><td class="highlight-cell"><div class="highlight-tools"><select aria-label="Highlight mode" onchange="setDelHighlightMode('${code}',${i},this.value)"><option value="auto" ${mode==='auto'?'selected':''}>Auto</option><option value="manual" ${mode==='manual'?'selected':''}>Manual</option></select><input type="color" value="${esc(color)}" title="Choose row colour" onchange="setDelHighlightColor('${code}',${i},this.value)" ${mode==='auto'?'disabled':''}></div></td><td><button class="btn-sm outline" onclick="removeDel('${code}',${i})">&times;</button></td></tr>`;
+    return `<tr class="${munRowClass(d,i,winners)}"${munRowStyle(d)}><td><input value="${esc(d.delegation)}" oninput="setDel('${code}',${i},'delegation',this.value)"></td>${Array.from({length:data.days},(_,day)=>`<td>${munRollSelect(code,i,day,d.rollCalls?.[day])}</td>`).join('')}${cols.map(c=>`<td><input type="number" value="${esc((d.values&&d.values[c])??'')}" oninput="setDelVal('${code}',${i},'${c.replace(/'/g,"\\'")}',this.value);updateMunTotalsInDom();refreshMunWinnerHighlightDom()"></td>`).join('')}<td class="total-cell">${munScoreTotal(d,cols)}</td><td class="highlight-cell"><div class="highlight-tools"><select aria-label="Highlight mode" onchange="setDelHighlightMode('${code}',${i},this.value)"><option value="auto" ${mode==='auto'?'selected':''}>Auto</option><option value="manual" ${mode==='manual'?'selected':''}>Manual</option></select><input type="color" value="${esc(color)}" title="Choose row colour" onchange="setDelHighlightColor('${code}',${i},this.value)" ${mode==='auto'?'disabled':''}></div></td><td><button class="btn-sm outline" onclick="removeDel('${code}',${i})">&times;</button></td></tr>`;
   }).join('');
-  return `<div class="index-box" style="margin-bottom:20px"><div class="index-head"><span class="label">MARKSHEET</span><span class="tag">${data.published?'LIVE':'DRAFT · AUTOSAVED'}</span></div><div class="marks-tools"><span>${esc(data.committee||'')}</span><span>${data.days} day${data.days===1?'':'s'} · ${data.delegates.length} delegations</span></div><div style="overflow-x:auto;margin-bottom:18px"><table class="marks"><thead><tr><th>Delegation</th>${Array.from({length:data.days},(_,i)=>`<th>Roll Call · Day ${i+1}</th>`).join('')}${cols.map(c=>`<th>${esc(c)} <span style="cursor:pointer" onclick="removeCol('${code}','${c.replace(/'/g,"\\'")}')">&times;</span></th>`).join('')}<th>TOTAL</th><th>HIGHLIGHT</th><th></th></tr></thead><tbody>${rows||`<tr><td colspan="${data.days+cols.length+4}" style="text-align:center;color:#8a8168">No delegations recorded.</td></tr>`}</tbody></table></div><div class="winner-note">AUTO = highest total is highlighted. Ties are highlighted together. Switch to MANUAL to colour a row yourself.</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn-sm orange" onclick="openAddCountryToConf('${code}')">+ Add delegation</button><button class="btn-sm outline" onclick="addCol('${code}')">+ Add marks column</button><button class="btn-sm outline" onclick="downloadMunExcel('${code}')">Download Excel</button>${data.published?`<button class="btn-sm outline" disabled>Already published</button>`:`<button class="btn-sm" onclick="publishConf('${code}')">Publish marksheet</button>`}</div></div><div class="index-box"><div class="index-head"><span class="label">DELEGATE CHATBOX</span></div>${munChat(data,code,true)}</div>`;
+  return `<div class="index-box" style="margin-bottom:20px"><div class="index-head"><span class="label">MARKSHEET</span><span class="tag">${data.published?'LIVE':'DRAFT · AUTOSAVED'}</span></div><div class="marks-tools"><span>${esc(data.committee||'')}</span><span>${data.days} day${data.days===1?'':'s'} · ${data.delegates.length} delegations</span></div><div style="overflow-x:auto;margin-bottom:18px"><table class="marks"><thead><tr><th>Delegation</th>${Array.from({length:data.days},(_,i)=>`<th>Roll Call · Day ${i+1}</th>`).join('')}${cols.map(c=>`<th>${esc(c)} <span style="cursor:pointer" onclick="removeCol('${code}','${c.replace(/'/g,"\\'")}')">&times;</span></th>`).join('')}<th>TOTAL</th><th>HIGHLIGHT</th><th></th></tr></thead><tbody>${rows||`<tr><td colspan="${data.days+cols.length+4}" style="text-align:center;color:#8a8168">No delegations recorded.</td></tr>`}</tbody></table></div><div class="winner-note">AUTO = highest total is highlighted. Ties are highlighted together. Switch to MANUAL to colour a row yourself.</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn-sm orange" onclick="openAddCountryToConf('${code}')">+ Add delegation</button><button class="btn-sm outline" onclick="addCol('${code}')">+ Add marks column</button><button class="btn-sm outline" onclick="arrangeMunMarksheet('${code}')">Arrange ↓ Marks</button><button class="btn-sm outline" onclick="downloadMunPDF('${code}')">Download PDF</button><button class="btn-sm outline" onclick="downloadMunExcel('${code}')">Download Excel</button>${data.published?`<button class="btn-sm outline" onclick="unpublishConf('${code}')">Unpublish</button><button class="btn-sm" onclick="publishConf('${code}')">Republish</button>`:`<button class="btn-sm" onclick="publishConf('${code}')">Publish marksheet</button>`}</div></div><div class="index-box"><div class="index-head"><span class="label">DELEGATE CHATBOX</span></div>${munChat(data,code,true)}</div>`;
 }
 async function openAddCountryToConf(code){const data=await sget('mun:conf:'+code);const selected=(data.delegates||[]).map(d=>d.delegation);const all=MUN_COUNTRIES.filter(c=>!selected.includes(c));const pick=await openCountryMatrix([]);if(!pick||!pick.length)return;const additions=pick.filter(c=>all.includes(c));data.delegates.push(...additions.map(c=>({delegation:c,rollCalls:Array(data.days).fill('P'),values:{}})));await sset('mun:conf:'+code,data);showToast(additions.length+' delegation(s) added.');render();}
 async function setDel(code,i,field,val){await queueMunSave(code,data=>{data.delegates[i][field]=val;});}
 async function setDelVal(code,i,col,val){await queueMunSave(code,data=>{data.delegates[i].values=data.delegates[i].values||{};data.delegates[i].values[col]=val;});}
+async function arrangeMunMarksheet(code, silent=false){
+  const pending=munSaveQueues.get(code);
+  if(pending) await pending.catch(()=>{});
+  const data=await sget('mun:conf:'+code);
+  if(!data)return;
+  const cols=data.columns||[];
+  data.delegates=(data.delegates||[]).map((d,idx)=>({...d,__munOriginalIndex:idx})).sort((a,b)=>{
+    const diff=munScoreTotal(b,cols)-munScoreTotal(a,cols);
+    return diff || (a.__munOriginalIndex-b.__munOriginalIndex);
+  }).map(({__munOriginalIndex,...d})=>d);
+  await sset('mun:conf:'+code,data);
+  if(!silent){showToast('Marksheet arranged by total, highest first.');render();}
+  return data;
+}
 async function setRollCall(code,i,day,val){await queueMunSave(code,data=>{data.delegates[i].rollCalls=data.delegates[i].rollCalls||Array(data.days).fill('P');data.delegates[i].rollCalls[day]=munRollCallCode(val);});}
 async function setDelHighlightMode(code,i,mode){await queueMunSave(code,data=>{data.delegates[i].highlight=data.delegates[i].highlight||{};data.delegates[i].highlight.mode=mode==='manual'?'manual':'auto';if(!data.delegates[i].highlight.color)data.delegates[i].highlight.color='#f4df9a';});render();}
 async function setDelHighlightColor(code,i,color){await queueMunSave(code,data=>{data.delegates[i].highlight=data.delegates[i].highlight||{};data.delegates[i].highlight.mode='manual';data.delegates[i].highlight.color=color;});const row=document.querySelectorAll('table.marks tbody tr')[i];if(row){row.classList.remove('mun-winner');row.classList.add('mun-manual-highlight');row.style.setProperty('--mun-highlight',color);}}
@@ -1284,13 +1328,60 @@ async function addDel(code){const v=await openFormModal({title:'Add delegation',
 async function removeDel(code,i){const ok=await openConfirmModal('Remove this delegation from the marksheet?',true);if(!ok)return;const data=await sget('mun:conf:'+code);data.delegates.splice(i,1);await sset('mun:conf:'+code,data);render();}
 async function addCol(code){const v=await openFormModal({title:'Add marks column',fields:[{name:'name',label:'Column name',placeholder:'e.g. Working Paper'}],submitLabel:'Add'});if(!v||!v.name)return;const data=await sget('mun:conf:'+code);if(!data.columns.includes(v.name))data.columns.push(v.name);await sset('mun:conf:'+code,data);render();}
 async function removeCol(code,col){const ok=await openConfirmModal(`Remove the column "${col}" from every delegation?`,true);if(!ok)return;const data=await sget('mun:conf:'+code);data.columns=data.columns.filter(c=>c!==col);await sset('mun:conf:'+code,data);render();}
-async function publishConf(code){const saved=await sget('site:admin-passcode');const v=await openFormModal({title:'Publish marksheet',desc:'Publishing makes the current draft visible to everyone. Your draft remains saved until then.',fields:[{name:'p',label:'Admin passcode',type:'password'}],submitLabel:'Publish'});if(!v)return;if(v.p!==saved){showToast('Incorrect passcode. Not published.');return}const data=await sget('mun:conf:'+code);data.published=true;data.draft=false;await sset('mun:conf:'+code,data);showToast('Marksheet published.');render();}
+async function publishConf(code){
+  const saved=await sget('site:admin-passcode');
+  const v=await openFormModal({title:'Publish marksheet',desc:'The current marksheet will be arranged highest-to-lowest by TOTAL and then published. Your draft remains saved.',fields:[{name:'p',label:'Admin passcode',type:'password'}],submitLabel:'Publish'});
+  if(!v)return;
+  if(v.p!==saved){showToast('Incorrect passcode. Not published.');return;}
+  const data=await arrangeMunMarksheet(code,true);
+  if(!data)return;
+  data.published=true;data.draft=false;data.publishedAt=Date.now();
+  await sset('mun:conf:'+code,data);
+  showToast('Marksheet arranged and published.');render();
+}
+async function unpublishConf(code){
+  const saved=await sget('site:admin-passcode');
+  const v=await openFormModal({title:'Unpublish marksheet',desc:'This will remove the public results from the conference page. Your saved marksheet will remain intact and editable.',fields:[{name:'p',label:'Admin passcode',type:'password'}],submitLabel:'Unpublish'});
+  if(!v)return;
+  if(v.p!==saved){showToast('Incorrect passcode. Still published.');return;}
+  const data=await sget('mun:conf:'+code);if(!data)return;
+  data.published=false;data.draft=true;
+  await sset('mun:conf:'+code,data);
+  showToast('Marksheet unpublished. The draft is still saved.');render();
+}
 async function downloadMunExcel(code){
   const data=await sget('mun:conf:'+code); if(!data)return;
   if(!window.XLSX){await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc);}).catch(()=>null);}
   const headers=['Delegation',...Array.from({length:data.days},(_,i)=>`Roll Call · Day ${i+1}`),...(data.columns||[]),'TOTAL'];
   const body=(data.delegates||[]).map(d=>[d.delegation,...Array.from({length:data.days},(_,i)=>munRollCallCode(d.rollCalls?.[i])),...(data.columns||[]).map(c=>d.values?.[c]??''),munScoreTotal(d,data.columns||[])]);
   if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([['MUN MARKSHEET'],[data.name],['Committee',data.committee],['Conference days',data.days],[],headers,...body]);ws['!cols']=headers.map(h=>({wch:Math.max(14,String(h).length+2)}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Marksheet');XLSX.writeFile(wb,`${data.name.replace(/[^a-z0-9]+/gi,'_')}_Marksheet.xlsx`);showToast('Excel file downloaded.');}else{const csv=[headers,...body].map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`${data.name}_Marksheet.csv`;a.click();showToast('Excel-compatible CSV downloaded.');}
+}
+async function downloadMunPDF(code){
+  const pending=munSaveQueues.get(code);
+  if(pending) await pending.catch(()=>{});
+  const data=await sget('mun:conf:'+code); if(!data)return;
+  if(!window.jspdf){await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc);}).catch(()=>null);}
+  if(!window.jspdf?.jsPDF){showToast('PDF library could not load. Please try again.');return;}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
+  const margin=28, pageW=doc.internal.pageSize.getWidth(), pageH=doc.internal.pageSize.getHeight();
+  doc.setFont('courier','bold');doc.setFontSize(16);doc.text(String(data.name||'MUN Marksheet'),margin,32);
+  doc.setFontSize(9);doc.setFont('courier','normal');doc.text(`${data.committee||'Committee'}  ·  ${data.days} day${data.days===1?'':'s'}  ·  ${(data.delegates||[]).length} delegations`,margin,48);
+  const cols=data.columns||[];
+  const headers=['Delegation',...Array.from({length:data.days},(_,i)=>`RC D${i+1}`),...cols,'TOTAL'];
+  const widths=[112,...Array(data.days).fill(42),...cols.map(()=>58),48];
+  const usable=pageW-margin*2, scale=Math.min(1,usable/widths.reduce((a,b)=>a+b,0));
+  const ws=widths.map(w=>w*scale);
+  let y=68,rowH=22;
+  const drawRow=(cells,bold=false)=>{
+    let x=margin;doc.setFont('courier',bold?'bold':'normal');doc.setFontSize(7);
+    cells.forEach((cell,i)=>{const w=ws[i]||50;doc.rect(x,y,w,rowH);doc.text(String(cell??'').slice(0,Math.max(6,Math.floor(w/5))),x+4,y+14);x+=w;});y+=rowH;
+    if(y>pageH-35){doc.addPage();y=30;}
+  };
+  drawRow(headers,true);
+  (data.delegates||[]).forEach(d=>drawRow([d.delegation,...Array.from({length:data.days},(_,i)=>munRollCallCode(d.rollCalls?.[i])),...cols.map(c=>d.values?.[c]??''),munScoreTotal(d,cols)]));
+  doc.save(`${String(data.name||'MUN').replace(/[^a-z0-9]+/gi,'_')}_Marksheet.pdf`);
+  showToast('PDF downloaded.');
 }
 function munTableReadonly(data){const cols=data.columns||[];const rows=(data.delegates||[]).map(d=>`<tr><td>${esc(d.delegation)}</td>${Array.from({length:data.days},(_,i)=>{const r=munRollCallCode(d.rollCalls?.[i]);return `<td class="${r==='P'?'rc-present':r==='A'?'rc-absent':'rc-pv'}">${esc(r)}</td>`}).join('')}${cols.map(c=>`<td>${esc((d.values&&d.values[c])??'')}</td>`).join('')}<td class="total-cell">${munScoreTotal(d,cols)}</td></tr>`).join('');return `<div class="index-head"><span class="label">RESULTS</span><span class="tag">${esc(data.committee||'')}</span></div><div style="overflow-x:auto"><table class="marks"><thead><tr><th>Delegation</th>${Array.from({length:data.days},(_,i)=>`<th>Roll Call · Day ${i+1}</th>`).join('')}${cols.map(c=>`<th>${esc(c)}</th>`).join('')}<th>TOTAL</th></tr></thead><tbody>${rows||`<tr><td colspan="${data.days+cols.length+2}" style="text-align:center;color:#8a8168">No delegations recorded.</td></tr>`}</tbody></table></div>`}
 
@@ -1350,6 +1441,7 @@ Object.assign(window, {
   removeDel,
   addCol,
   removeCol,
+  arrangeMunMarksheet,
   publishConf,
   downloadMunExcel,
   openCountryMatrix,
